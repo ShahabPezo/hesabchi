@@ -253,6 +253,42 @@ class _RentalStatusCard extends StatelessWidget {
   }
 }
 
+class _RentalAmountLine extends StatelessWidget {
+  const _RentalAmountLine({
+    required this.label,
+    required this.value,
+    this.emphasized = false,
+  });
+
+  final String label;
+  final String value;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          '$label: ',
+          style: Theme.of(context).textTheme.bodySmall
+              ?.copyWith(color: AppColors.mutedText),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              fontWeight: emphasized ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _RentalMonthRow extends StatelessWidget {
   const _RentalMonthRow({required this.month, required this.isLast});
 
@@ -283,26 +319,20 @@ class _RentalMonthRow extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'اجاره: ${formatMoney(month.rentDue.round())}',
-                style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: AppColors.mutedText),
-              ),
-              Text(
-                'پرداختی: ${formatMoney(month.paid.round())}',
-                style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: AppColors.mutedText),
-              ),
-              Text(
-                'مانده: ${formatMoney(month.balance.round())}',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
-              ),
-            ],
+          _RentalAmountLine(
+            label: 'اجاره',
+            value: formatMoney(month.rentDue.round()),
+          ),
+          const SizedBox(height: 4),
+          _RentalAmountLine(
+            label: 'پرداختی',
+            value: formatMoney(month.paid.round()),
+          ),
+          const SizedBox(height: 4),
+          _RentalAmountLine(
+            label: 'مانده',
+            value: formatMoney(month.balance.round()),
+            emphasized: true,
           ),
           if (!isLast)
             const Padding(
