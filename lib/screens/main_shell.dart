@@ -9,6 +9,7 @@ import 'invoices_screen.dart';
 import 'prices_screen.dart';
 import 'settings_screen.dart';
 import 'statistics_screen.dart';
+import 'store_status_screen.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({
@@ -26,7 +27,7 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-enum _MoreDestination { employeeSalary, invoices, settings }
+enum _MoreDestination { employeeSalary, invoices, storeStatus, settings }
 
 class _MainShellState extends State<MainShell> {
   var _index = 0;
@@ -127,10 +128,19 @@ class _MainShellState extends State<MainShell> {
               const Divider(height: 1),
               _MoreMenuTile(
                 icon: Icons.receipt_long_outlined,
-                title: 'فاکتورها',
+                title: 'فاکتورهای مشتری',
                 subtitle: 'فهرست و جزئیات فاکتورهای ثبت‌شده',
                 onTap: () =>
                     Navigator.of(sheetContext).pop(_MoreDestination.invoices),
+              ),
+              const Divider(height: 1),
+              _MoreMenuTile(
+                icon: Icons.storefront_outlined,
+                title: 'وضعیت فروشگاه‌ها',
+                subtitle: 'بار، اجاره و فاکتورهای ورود کارتن فروشگاهی',
+                onTap: () => Navigator.of(
+                  sheetContext,
+                ).pop(_MoreDestination.storeStatus),
               ),
               const Divider(height: 1),
               _MoreMenuTile(
@@ -154,8 +164,12 @@ class _MainShellState extends State<MainShell> {
             body: const EmployeeSalaryScreen(),
           ),
           _MoreDestination.invoices => Scaffold(
-            appBar: AppBar(title: const Text('فاکتورها')),
+            appBar: AppBar(title: const Text('فاکتورهای مشتری')),
             body: const InvoicesScreen(),
+          ),
+          _MoreDestination.storeStatus => Scaffold(
+            appBar: AppBar(title: const Text('وضعیت فروشگاه‌ها')),
+            body: const StoreStatusScreen(),
           ),
           _MoreDestination.settings => Scaffold(
             appBar: AppBar(title: const Text('تنظیمات')),

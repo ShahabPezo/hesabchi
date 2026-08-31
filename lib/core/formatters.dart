@@ -31,6 +31,21 @@ String formatJalaliDate(DateTime date, {bool withTime = false}) {
   return '${toPersianDigits(dateText)}، ${toPersianDigits(timeText)}';
 }
 
+const List<String> persianMonthNames = [
+  'فروردین',
+  'اردیبهشت',
+  'خرداد',
+  'تیر',
+  'مرداد',
+  'شهریور',
+  'مهر',
+  'آبان',
+  'آذر',
+  'دی',
+  'بهمن',
+  'اسفند',
+];
+
 String toPersianDigits(String value) {
   const latin = '0123456789';
   const persian = '۰۱۲۳۴۵۶۷۸۹';

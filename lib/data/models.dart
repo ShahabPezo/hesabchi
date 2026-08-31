@@ -660,6 +660,238 @@ class PriceItem {
   }
 }
 
+class StoreStatusStore {
+  const StoreStatusStore({required this.id, required this.name});
+
+  final String id;
+  final String name;
+
+  factory StoreStatusStore.fromJson(Map<String, dynamic> json) {
+    const scope = 'فروشگاه وضعیت فروشگاه‌ها';
+    return StoreStatusStore(
+      id: _requiredText(json, 'id', scope: scope),
+      name: _requiredText(json, 'name', scope: scope),
+    );
+  }
+}
+
+class StoreCargoEntry {
+  const StoreCargoEntry({
+    required this.id,
+    required this.storeId,
+    required this.storeName,
+    required this.date,
+    required this.grossWeightKg,
+    required this.netWeightKg,
+    required this.plateOrHelper,
+    required this.description,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String storeId;
+  final String storeName;
+  final DateTime date;
+  final num grossWeightKg;
+  final num netWeightKg;
+  final String plateOrHelper;
+  final String description;
+  final DateTime createdAt;
+
+  factory StoreCargoEntry.fromJson(Map<String, dynamic> json) {
+    const scope = 'ورود کارتن فروشگاهی';
+    return StoreCargoEntry(
+      id: _requiredText(json, 'id', scope: scope),
+      storeId: _requiredText(json, 'storeId', scope: scope),
+      storeName: _requiredText(json, 'storeName', scope: scope),
+      date: _requiredDate(json, 'date', scope: scope),
+      grossWeightKg: _requiredNonNegativeNumber(
+        json,
+        'grossWeightKg',
+        scope: scope,
+      ),
+      netWeightKg: _requiredNonNegativeNumber(
+        json,
+        'netWeightKg',
+        scope: scope,
+      ),
+      plateOrHelper: _optionalText(json['plateOrHelper']),
+      description: _optionalText(json['description']),
+      createdAt: _requiredDate(json, 'createdAt', scope: scope),
+    );
+  }
+}
+
+class StoreRentalContract {
+  const StoreRentalContract({
+    required this.startDate,
+    required this.endDate,
+    required this.deposit,
+    required this.monthlyRent,
+  });
+
+  final String startDate;
+  final String? endDate;
+  final num deposit;
+  final num monthlyRent;
+
+  factory StoreRentalContract.fromJson(Map<String, dynamic> json) {
+    const scope = 'قرارداد اجاره فروشگاه';
+    return StoreRentalContract(
+      startDate: _requiredJalaliDateText(json, 'startDate', scope: scope),
+      endDate: _optionalJalaliDateText(json['endDate'], scope: scope),
+      deposit: _requiredNonNegativeNumber(json, 'deposit', scope: scope),
+      monthlyRent: _requiredNonNegativeNumber(
+        json,
+        'monthlyRent',
+        scope: scope,
+      ),
+    );
+  }
+}
+
+class StoreRentalMonth {
+  const StoreRentalMonth({
+    required this.year,
+    required this.month,
+    required this.monthLabel,
+    required this.rentDue,
+    required this.paid,
+    required this.balance,
+    required this.status,
+  });
+
+  final int year;
+  final int month;
+  final String monthLabel;
+  final num rentDue;
+  final num paid;
+  final num balance;
+  final String status;
+
+  factory StoreRentalMonth.fromJson(Map<String, dynamic> json) {
+    const scope = 'وضعیت ماهانه اجاره فروشگاه';
+    return StoreRentalMonth(
+      year: _requiredInteger(json, 'year', scope: scope),
+      month: _requiredInteger(json, 'month', scope: scope),
+      monthLabel: _requiredText(json, 'monthLabel', scope: scope),
+      rentDue: _requiredNonNegativeNumber(json, 'rentDue', scope: scope),
+      paid: _requiredNonNegativeNumber(json, 'paid', scope: scope),
+      balance: _requiredNumber(json, 'balance', scope: scope),
+      status: _requiredText(json, 'status', scope: scope),
+    );
+  }
+}
+
+class StoreRentalTotals {
+  const StoreRentalTotals({
+    required this.due,
+    required this.paid,
+    required this.balance,
+  });
+
+  final num due;
+  final num paid;
+  final num balance;
+
+  factory StoreRentalTotals.fromJson(Map<String, dynamic> json) {
+    const scope = 'جمع اجاره فروشگاه';
+    return StoreRentalTotals(
+      due: _requiredNonNegativeNumber(json, 'due', scope: scope),
+      paid: _requiredNonNegativeNumber(json, 'paid', scope: scope),
+      balance: _requiredNumber(json, 'balance', scope: scope),
+    );
+  }
+}
+
+class StoreRentalStatus {
+  const StoreRentalStatus({
+    required this.storeId,
+    required this.storeName,
+    required this.contract,
+    required this.months,
+    required this.totals,
+  });
+
+  final String storeId;
+  final String storeName;
+  final StoreRentalContract contract;
+  final List<StoreRentalMonth> months;
+  final StoreRentalTotals totals;
+
+  factory StoreRentalStatus.fromJson(Map<String, dynamic> json) {
+    const scope = 'وضعیت اجاره فروشگاه';
+    final months = _optionalList(json['months'], scope: scope)
+        .map(
+          (item) => StoreRentalMonth.fromJson(
+            _asMap(item, scope: 'وضعیت ماهانه اجاره فروشگاه'),
+          ),
+        )
+        .toList(growable: false);
+    return StoreRentalStatus(
+      storeId: _requiredText(json, 'storeId', scope: scope),
+      storeName: _requiredText(json, 'storeName', scope: scope),
+      contract: StoreRentalContract.fromJson(
+        _asMap(json['contract'], scope: 'قرارداد اجاره فروشگاه'),
+      ),
+      months: months,
+      totals: StoreRentalTotals.fromJson(
+        _asMap(json['totals'], scope: 'جمع اجاره فروشگاه'),
+      ),
+    );
+  }
+}
+
+class StoreStatus {
+  const StoreStatus({
+    required this.stores,
+    required this.cargoEntries,
+    required this.rentalStatus,
+  });
+
+  const StoreStatus.empty()
+    : stores = const [],
+      cargoEntries = const [],
+      rentalStatus = const [];
+
+  final List<StoreStatusStore> stores;
+  final List<StoreCargoEntry> cargoEntries;
+  final List<StoreRentalStatus> rentalStatus;
+
+  factory StoreStatus.fromJson(dynamic rawStoreStatus) {
+    // فایل‌های HCH قدیمی‌تر این فیلد را ندارند؛ نبود آن خطا نیست.
+    if (rawStoreStatus == null) return const StoreStatus.empty();
+    final json = _asMap(rawStoreStatus, scope: 'وضعیت فروشگاه‌ها');
+    final stores = _optionalList(json['stores'], scope: 'وضعیت فروشگاه‌ها')
+        .map(
+          (item) =>
+              StoreStatusStore.fromJson(_asMap(item, scope: 'فروشگاه')),
+        )
+        .toList(growable: false);
+    final cargoEntries =
+        _optionalList(json['cargoEntries'], scope: 'وضعیت فروشگاه‌ها')
+            .map(
+              (item) => StoreCargoEntry.fromJson(
+                _asMap(item, scope: 'ورود کارتن فروشگاهی'),
+              ),
+            )
+            .toList(growable: false);
+    final rentalStatus =
+        _optionalList(json['rentalStatus'], scope: 'وضعیت فروشگاه‌ها')
+            .map(
+              (item) => StoreRentalStatus.fromJson(
+                _asMap(item, scope: 'وضعیت اجاره فروشگاه'),
+              ),
+            )
+            .toList(growable: false);
+    return StoreStatus(
+      stores: stores,
+      cargoEntries: cargoEntries,
+      rentalStatus: rentalStatus,
+    );
+  }
+}
+
 class BusinessDataset {
   const BusinessDataset({
     required this.version,
@@ -671,6 +903,7 @@ class BusinessDataset {
     required this.customers,
     required this.invoices,
     required this.prices,
+    required this.storeStatus,
     required this.rawJson,
   });
 
@@ -685,6 +918,7 @@ class BusinessDataset {
   final List<Customer> customers;
   final List<Invoice> invoices;
   final List<PriceItem> prices;
+  final StoreStatus storeStatus;
   final String rawJson;
 
   int get totalReceivable =>
@@ -765,6 +999,7 @@ class BusinessDataset {
       customers: customers,
       invoices: invoices,
       prices: prices,
+      storeStatus: StoreStatus.fromJson(json['storeStatus']),
       rawJson: source,
     );
   }

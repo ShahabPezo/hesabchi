@@ -6,6 +6,7 @@ import 'package:namayeshyar/screens/home_screen.dart';
 import 'package:namayeshyar/screens/main_shell.dart';
 import 'package:namayeshyar/screens/settings_screen.dart';
 import 'package:namayeshyar/screens/statistics_screen.dart';
+import 'package:namayeshyar/screens/store_status_screen.dart';
 import 'package:namayeshyar/state/app_controller.dart';
 import 'package:provider/provider.dart';
 
@@ -105,7 +106,8 @@ void main() {
     await tester.tap(find.text('بیشتر'));
     await tester.pumpAndSettle();
     expect(find.text('حقوق افراد'), findsOneWidget);
-    expect(find.text('فاکتورها'), findsOneWidget);
+    expect(find.text('فاکتورهای مشتری'), findsOneWidget);
+    expect(find.text('وضعیت فروشگاه‌ها'), findsOneWidget);
     expect(find.text('تنظیمات'), findsOneWidget);
 
     await tester.tap(find.text('تنظیمات'));
@@ -176,6 +178,63 @@ void main() {
     );
   });
 
+  test('داده اختیاری وضعیت فروشگاه‌ها HCH خوانده می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(_storeStatusJson(validJson));
+
+    expect(dataset.storeStatus.stores, hasLength(1));
+    expect(dataset.storeStatus.stores.single.name, 'فروشگاه تست');
+    expect(dataset.storeStatus.cargoEntries, hasLength(1));
+    expect(dataset.storeStatus.cargoEntries.single.netWeightKg, 500);
+    expect(dataset.storeStatus.rentalStatus, hasLength(1));
+    expect(dataset.storeStatus.rentalStatus.single.months, hasLength(1));
+  });
+
+  test('نبود وضعیت فروشگاه‌ها در HCH قدیمی خطا ایجاد نمی‌کند', () {
+    final dataset = BusinessDataset.fromRawJson(validJson);
+
+    expect(dataset.storeStatus.stores, isEmpty);
+    expect(dataset.storeStatus.cargoEntries, isEmpty);
+    expect(dataset.storeStatus.rentalStatus, isEmpty);
+  });
+
+  testWidgets('صفحه وضعیت فروشگاه‌ها برای HCH قدیمی بدون داده کرش نمی‌کند', (
+    tester,
+  ) async {
+    final controller = _DatasetController(
+      BusinessDataset.fromRawJson(validJson),
+    );
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      ChangeNotifierProvider<AppController>.value(
+        value: controller,
+        child: const MaterialApp(home: StoreStatusScreen()),
+      ),
+    );
+
+    expect(
+      find.text('داده‌ای برای وضعیت فروشگاه‌ها در این فایل موجود نیست.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('صفحه وضعیت فروشگاه‌ها فاکتور ورود کارتن را نشان می‌دهد', (
+    tester,
+  ) async {
+    final controller = _DatasetController(
+      BusinessDataset.fromRawJson(_storeStatusJson(validJson)),
+    );
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      ChangeNotifierProvider<AppController>.value(
+        value: controller,
+        child: const MaterialApp(home: StoreStatusScreen()),
+      ),
+    );
+
+    expect(find.text('فروشگاه تست'), findsWidgets);
+    expect(find.text('وضعیت اجاره'), findsOneWidget);
+  });
+
   test('فاکتور با مشتری ناشناخته رد می‌شود', () {
     final brokenReference = validJson.replaceFirst(
       '"customerId": "C-1"',
@@ -226,6 +285,36 @@ String _employeeSalaryJson(String source) =>
       "previousAccountEntries": [{"date": "1404/04/02", "amount": -150000}]
     }
   ],
+  "prices": [''');
+
+String _storeStatusJson(String source) =>
+    source.replaceFirst('"prices": [', '''"storeStatus": {
+    "stores": [{"id": "STORE-1", "name": "فروشگاه تست"}],
+    "cargoEntries": [
+      {
+        "id": "SC-1",
+        "storeId": "STORE-1",
+        "storeName": "فروشگاه تست",
+        "date": "2024-07-31T00:00:00Z",
+        "grossWeightKg": 520.0,
+        "netWeightKg": 500.0,
+        "plateOrHelper": "12ب345",
+        "description": "",
+        "createdAt": "2024-07-31T00:00:00Z"
+      }
+    ],
+    "rentalStatus": [
+      {
+        "storeId": "STORE-1",
+        "storeName": "فروشگاه تست",
+        "contract": {"startDate": "1403/01/01", "endDate": null, "deposit": 50000000, "monthlyRent": 20000000},
+        "months": [
+          {"year": 1403, "month": 1, "monthLabel": "فروردین 1403", "rentDue": 20000000, "paid": 0, "balance": 20000000, "status": "پرداخت نشده"}
+        ],
+        "totals": {"due": 20000000, "paid": 0, "balance": 20000000}
+      }
+    ]
+  },
   "prices": [''');
 
 String _rangedJson(String source) =>
