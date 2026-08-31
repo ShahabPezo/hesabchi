@@ -1,0 +1,45 @@
+name: namayeshyar
+description: "حسابچی؛ نمایش آفلاین مشتریان، فاکتورها و قیمت‌ها"
+publish_to: 'none'
+version: 1.5.1+16
+
+environment:
+  sdk: ^3.13.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  file_picker: ^10.3.10
+  http: ^1.3.0
+  intl: ^0.20.2
+  path: ^1.9.1
+  path_provider: ^2.1.5
+  provider: ^6.1.5+1
+  shamsi_date: ^1.1.1
+  share_handler: ^0.0.23
+  shared_preferences: ^2.5.4
+  sqflite: ^2.4.2
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/samples/
+  fonts:
+    - family: Vazirmatn
+      fonts:
+        - asset: assets/fonts/Vazirmatn-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Vazirmatn-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Vazirmatn-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Vazirmatn-Bold.ttf
+          weight: 700

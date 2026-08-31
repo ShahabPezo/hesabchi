@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hesabchi_window_background">#F6F8FC</color>
+    <color name="hesabchi_status_bar">#0A2145</color>
+    <color name="hesabchi_navigation_bar">#FFFFFF</color>
+</resources>

@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "exportedAt": "2026-08-20T10:30:00Z",
+  "business": {
+    "name": "تجارت نمونه آریا",
+    "currency": "IRR"
+  },
+  "customers": [
+    {
+      "id": "C-1001",
+      "name": "فروشگاه مهر",
+      "phone": "09121234567",
+      "balance": 12500000,
+      "updatedAt": "2026-08-20T10:00:00Z"
+    },
+    {
+      "id": "C-1002",
+      "name": "شرکت پخش پرتو",
+      "phone": "09351234567",
+      "balance": 0,
+      "updatedAt": "2026-08-19T15:20:00Z"
+    },
+    {
+      "id": "C-1003",
+      "name": "فروشگاه ستاره",
+      "phone": "09011234567",
+      "balance": 4850000,
+      "updatedAt": "2026-08-18T08:05:00Z"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "INV-1001",
+      "customerId": "C-1001",
+      "customerName": "فروشگاه مهر",
+      "issuedAt": "2026-08-18T00:00:00Z",
+      "dueAt": "2026-08-25T00:00:00Z",
+      "total": 20000000,
+      "paid": 7500000,
+      "status": "partial",
+      "items": [
+        {
+          "title": "کالای نمونه A",
+          "quantity": 2,
+          "unitPrice": 10000000,
+          "total": 20000000
+        }
+      ]
+    },
+    {
+      "id": "INV-1002",
+      "customerId": "C-1002",
+      "customerName": "شرکت پخش پرتو",
+      "issuedAt": "2026-08-16T00:00:00Z",
+      "dueAt": "2026-08-23T00:00:00Z",
+      "total": 8900000,
+      "paid": 8900000,
+      "status": "paid",
+      "items": [
+        {
+          "title": "کالای نمونه B",
+          "quantity": 1,
+          "unitPrice": 8900000,
+          "total": 8900000
+        }
+      ]
+    },
+    {
+      "id": "INV-1003",
+      "customerId": "C-1003",
+      "customerName": "فروشگاه ستاره",
+      "issuedAt": "2026-08-10T00:00:00Z",
+      "dueAt": "2026-08-17T00:00:00Z",
+      "total": 4850000,
+      "paid": 0,
+      "status": "overdue",
+      "items": [
+        {
+          "title": "کالای نمونه C",
+          "quantity": 5,
+          "unitPrice": 970000,
+          "total": 4850000
+        }
+      ]
+    }
+  ],
+  "prices": [
+    {
+      "id": "P-1001",
+      "title": "کالای نمونه A",
+      "sku": "SKU-1001",
+      "price": 10000000,
+      "updatedAt": "2026-08-20T10:00:00Z"
+    },
+    {
+      "id": "P-1002",
+      "title": "کالای نمونه B",
+      "sku": "SKU-1002",
+      "price": 8900000,
+      "updatedAt": "2026-08-19T15:20:00Z"
+    },
+    {
+      "id": "P-1003",
+      "title": "کالای نمونه C",
+      "sku": "SKU-1003",
+      "price": 970000,
+      "updatedAt": "2026-08-18T08:05:00Z"
+    }
+  ]
+}

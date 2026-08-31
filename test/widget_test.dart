@@ -1,0 +1,292 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:namayeshyar/data/models.dart';
+import 'package:namayeshyar/screens/employee_salary_screen.dart';
+import 'package:namayeshyar/screens/home_screen.dart';
+import 'package:namayeshyar/screens/main_shell.dart';
+import 'package:namayeshyar/screens/settings_screen.dart';
+import 'package:namayeshyar/screens/statistics_screen.dart';
+import 'package:namayeshyar/state/app_controller.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  const validJson = '''
+  {
+    "version": 1,
+    "exportedAt": "2026-08-20T10:30:00Z",
+    "business": {"name": "کسب‌وکار آزمایشی", "currency": "IRR"},
+    "customers": [
+      {"id": "C-1", "name": "مشتری آزمایشی", "phone": "", "balance": 120000, "updatedAt": "2026-08-20T10:00:00Z"}
+    ],
+    "invoices": [
+      {
+        "id": "I-1", "customerId": "C-1", "customerName": "مشتری آزمایشی",
+        "issuedAt": "2026-08-19T00:00:00Z", "dueAt": "2026-08-25T00:00:00Z",
+        "total": 120000, "paid": 0, "status": "unpaid",
+        "items": [{"title": "کالا", "quantity": 1, "unitPrice": 120000, "total": 120000}]
+      }
+    ],
+    "prices": [
+      {"id": "P-1", "title": "کالا", "sku": "A1", "price": 120000, "updatedAt": "2026-08-20T10:00:00Z"}
+    ]
+  }
+  ''';
+
+  test('داده نسخه یک معتبر تحلیل و نگهداری می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(validJson);
+
+    expect(dataset.business.name, 'کسب‌وکار آزمایشی');
+    expect(dataset.customers, hasLength(1));
+    expect(dataset.invoices.single.remaining, 120000);
+    expect(dataset.prices.single.sku, 'A1');
+    expect(dataset.scope.type, InvoiceScopeType.all);
+    expect(dataset.scope.displayText, 'کل فاکتورها');
+    expect(dataset.monthlyStatuses, isEmpty);
+    expect(dataset.employeeSalaries, isEmpty);
+  });
+
+  test('بازه فاکتورها از کلید scope فایل HCH خوانده می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(_rangedJson(validJson));
+
+    expect(dataset.scope.type, InvoiceScopeType.range);
+    expect(dataset.scope.displayText, 'از 1404/01/01 تا 1404/06/31');
+  });
+
+  testWidgets('تب خانه با فایل قدیمی بدون scope رندر می‌شود', (tester) async {
+    await _pumpHome(tester, validJson);
+
+    expect(find.text('سلام، خوش آمدید'), findsOneWidget);
+    expect(find.text('کل فاکتورها'), findsOneWidget);
+  });
+
+  testWidgets('تب خانه با فایل بازه‌دار بدون توقف رندر می‌کند', (tester) async {
+    await _pumpHome(tester, _rangedJson(validJson));
+
+    expect(find.text('از ۱۴۰۴/۰۱/۰۱ تا ۱۴۰۴/۰۶/۳۱'), findsOneWidget);
+  });
+
+  test('داده وضعیت ماهانه HCH خوانده و بر اساس ماه مرتب می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(_monthlyJson(validJson));
+
+    expect(dataset.monthlyStatuses, hasLength(2));
+    expect(dataset.monthlyStatuses.last.monthLabel, '1404/06');
+    expect(dataset.monthlyStatuses.last.topCustomers.first.name, 'شرکت الف');
+    expect(dataset.monthlyStatuses.last.cargoCustomer.cargoAmount, 850000000);
+  });
+
+  testWidgets('تب آمار برای فایل HCH قدیمی حالت خالی سازگار نشان می‌دهد', (
+    tester,
+  ) async {
+    await _pumpStatistics(tester, validJson);
+
+    expect(find.text('داده‌ای برای آمار ماهانه موجود نیست'), findsOneWidget);
+  });
+
+  testWidgets('تب آمار جدیدترین ماه و مشتری برتر را رندر می‌کند', (
+    tester,
+  ) async {
+    await _pumpStatistics(tester, _monthlyJson(validJson));
+
+    expect(find.text('۱۴۰۴/۰۶'), findsOneWidget);
+    expect(find.text('وضعیت ماهانه بار تفکیکی'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('۶٬۲۹۵ تومان / کیلو'), 360);
+    expect(find.text('۶٬۲۹۵ تومان / کیلو'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('شرکت الف'), 360);
+    expect(find.text('شرکت الف'), findsOneWidget);
+  });
+
+  testWidgets('آمار و گزینه‌های منوی بیشتر در دسترس‌اند', (tester) async {
+    await _pumpShell(tester, validJson);
+
+    await tester.tap(find.text('آمار'));
+    await tester.pumpAndSettle();
+    expect(find.text('داده‌ای برای آمار ماهانه موجود نیست'), findsOneWidget);
+
+    await tester.tap(find.text('بیشتر'));
+    await tester.pumpAndSettle();
+    expect(find.text('حقوق افراد'), findsOneWidget);
+    expect(find.text('فاکتورها'), findsOneWidget);
+    expect(find.text('تنظیمات'), findsOneWidget);
+
+    await tester.tap(find.text('تنظیمات'));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(AppBar, 'تنظیمات'), findsOneWidget);
+    expect(find.text('اطلاعات دیتابیس'), findsOneWidget);
+  });
+
+  test('داده اختیاری حقوق افراد HCH خوانده می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(_employeeSalaryJson(validJson));
+
+    expect(dataset.employeeSalaries, hasLength(1));
+    expect(dataset.employeeSalaries.single.name, 'علی رضایی');
+    expect(dataset.employeeSalaries.single.extraServices, hasLength(3));
+  });
+
+  testWidgets('صفحه حقوق افراد برای HCH قدیمی بدون داده کرش نمی‌کند', (
+    tester,
+  ) async {
+    final controller = _DatasetController(
+      BusinessDataset.fromRawJson(validJson),
+    );
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      ChangeNotifierProvider<AppController>.value(
+        value: controller,
+        child: const MaterialApp(home: EmployeeSalaryScreen()),
+      ),
+    );
+
+    expect(
+      find.text('داده‌ای برای حقوق افراد در این فایل موجود نیست.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('تنظیمات با داده پاک‌شده رندر خطرناک ندارد', (tester) async {
+    final controller = AppController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      ChangeNotifierProvider<AppController>.value(
+        value: controller,
+        child: MaterialApp(
+          home: SettingsScreen(
+            onImport: _noOp,
+            onDataCleared: _noOp,
+            onSync: _noOpAsync,
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+  });
+
+  test('نسخه پشتیبانی‌نشده با خطای قابل فهم رد می‌شود', () {
+    final unsupported = validJson.replaceFirst('"version": 1', '"version": 2');
+
+    expect(
+      () => BusinessDataset.fromRawJson(unsupported),
+      throwsA(
+        isA<ImportValidationException>().having(
+          (error) => error.message,
+          'message',
+          contains('پشتیبانی نمی‌شود'),
+        ),
+      ),
+    );
+  });
+
+  test('فاکتور با مشتری ناشناخته رد می‌شود', () {
+    final brokenReference = validJson.replaceFirst(
+      '"customerId": "C-1"',
+      '"customerId": "C-999"',
+    );
+
+    expect(
+      () => BusinessDataset.fromRawJson(brokenReference),
+      throwsA(isA<ImportValidationException>()),
+    );
+  });
+}
+
+String _monthlyJson(String source) =>
+    source.replaceFirst('"prices": [', '''"monthlyStatus": [
+    {
+      "year": 1404,
+      "month": 5,
+      "monthLabel": "1404/05",
+      "cargoCustomer": {"customerGrossWeight": 1000, "customerNetWeight": 950, "cargoAmount": 7000000, "moisturePercent": 5, "paperWeight": 50, "customerWeight": 900, "customerPrice": 7777},
+      "cargoStore": {"storeNetWeight": 600, "storeRentTotal": 1000000, "nylonWeight": 30, "plasticWeight": 20, "guniWeight": 10, "storeCartonWeight": 540, "storeCartonPrice": 1851},
+      "overallTotals": {"customerWeight": 900, "storeCartonWeight": 540, "netInputCarton": 1440, "inputCartonPrice": 4861},
+      "topCustomers": [{"rank": 1, "name": "شرکت قدیمی", "netWeight": 900, "percent": 100}]
+    },
+    {
+      "year": 1404,
+      "month": 6,
+      "monthLabel": "1404/06",
+      "cargoCustomer": {"customerGrossWeight": 125000, "customerNetWeight": 118500, "cargoAmount": 850000000, "moisturePercent": 5.2, "paperWeight": 3200, "customerWeight": 115300, "customerPrice": 7371.0},
+      "cargoStore": {"storeNetWeight": 42000, "storeRentTotal": 120000000, "nylonWeight": 1800, "plasticWeight": 900, "guniWeight": 400, "storeCartonWeight": 38900, "storeCartonPrice": 3084.8},
+      "overallTotals": {"customerWeight": 115300, "storeCartonWeight": 38900, "netInputCarton": 154200, "inputCartonPrice": 6294.5},
+      "topCustomers": [{"rank": 1, "name": "شرکت الف", "netWeight": 32000, "percent": 27.8}, {"rank": 2, "name": "شرکت ب", "netWeight": 21000, "percent": 18.2}]
+    }
+  ],
+  "prices": [''');
+
+String _employeeSalaryJson(String source) =>
+    source.replaceFirst('"prices": [', '''"employeeSalary": [
+    {
+      "name": "علی رضایی",
+      "phone": "09121234567",
+      "profileHistory": [
+        {"actionDate": "1404/04/01", "baseSalary": 18000000, "startDate": "1403/05/10", "lastSettleDate": "1404/04/01", "lastBalance": -200000}
+      ],
+      "offdays": [{"date": "1404/04/05"}],
+      "extraServices": [{"date": "1404/04/03"}, {"date": "1404/04/03"}, {"date": "1404/04/20"}],
+      "deposits": [{"amount": 5000000, "billingYear": 1404, "billingMonth": 4}],
+      "previousAccountEntries": [{"date": "1404/04/02", "amount": -150000}]
+    }
+  ],
+  "prices": [''');
+
+String _rangedJson(String source) =>
+    source.replaceFirst('"exportedAt"', '''"scope": {
+    "type": "range",
+    "startDate": "1404/01/01",
+    "endDate": "1404/06/31"
+  },
+  "exportedAt"''');
+
+Future<void> _pumpShell(WidgetTester tester, String source) async {
+  final controller = _DatasetController(BusinessDataset.fromRawJson(source));
+  addTearDown(controller.dispose);
+
+  await tester.pumpWidget(
+    ChangeNotifierProvider<AppController>.value(
+      value: controller,
+      child: MaterialApp(
+        home: MainShell(
+          onImport: _noOp,
+          onDataCleared: _noOp,
+          onSync: _noOpAsync,
+        ),
+      ),
+    ),
+  );
+}
+
+Future<void> _pumpStatistics(WidgetTester tester, String source) async {
+  final controller = _DatasetController(BusinessDataset.fromRawJson(source));
+  addTearDown(controller.dispose);
+
+  await tester.pumpWidget(
+    ChangeNotifierProvider<AppController>.value(
+      value: controller,
+      child: const MaterialApp(home: StatisticsScreen(onImport: _noOp)),
+    ),
+  );
+}
+
+Future<void> _pumpHome(WidgetTester tester, String source) async {
+  final controller = _DatasetController(BusinessDataset.fromRawJson(source));
+  addTearDown(controller.dispose);
+
+  await tester.pumpWidget(
+    ChangeNotifierProvider<AppController>.value(
+      value: controller,
+      child: const MaterialApp(home: HomeScreen(onImport: _noOp)),
+    ),
+  );
+}
+
+void _noOp() {}
+
+Future<void> _noOpAsync() async {}
+
+class _DatasetController extends AppController {
+  _DatasetController(this._testDataset);
+
+  final BusinessDataset _testDataset;
+
+  @override
+  BusinessDataset? get dataset => _testDataset;
+}
