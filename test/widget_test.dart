@@ -108,6 +108,7 @@ void main() {
     expect(find.text('حقوق افراد'), findsOneWidget);
     expect(find.text('فاکتورهای مشتری'), findsOneWidget);
     expect(find.text('وضعیت فروشگاه‌ها'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('تنظیمات'), 200);
     expect(find.text('تنظیمات'), findsOneWidget);
 
     await tester.tap(find.text('تنظیمات'));
