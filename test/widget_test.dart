@@ -34,7 +34,7 @@ void main() {
   }
   ''';
 
-  const _directoryJson = '''
+  const directoryJson = '''
   {
     "version": 1,
     "exportedAt": "2026-08-20T10:30:00Z",
@@ -274,7 +274,7 @@ void main() {
   });
 
   test('گروگذاری فاکتور برای هر مشتری در دفترچه مشتریان محاسبه می‌شود', () {
-    final dataset = BusinessDataset.fromRawJson(_directoryJson);
+    final dataset = BusinessDataset.fromRawJson(directoryJson);
 
     expect(dataset.customers, hasLength(2));
     expect(dataset.invoices, hasLength(3));
@@ -301,7 +301,7 @@ void main() {
     tester,
   ) async {
     final controller = _DatasetController(
-      BusinessDataset.fromRawJson(_directoryJson),
+      BusinessDataset.fromRawJson(directoryJson),
     );
     addTearDown(controller.dispose);
     await tester.pumpWidget(
