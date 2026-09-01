@@ -108,10 +108,12 @@ void main() {
     expect(find.text('حقوق افراد'), findsOneWidget);
     expect(find.text('فاکتورهای مشتری'), findsOneWidget);
     expect(find.text('وضعیت فروشگاه‌ها'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('تنظیمات'), 200);
-    expect(find.text('تنظیمات'), findsOneWidget);
+    final settingsTile = find.widgetWithText(ListTile, 'تنظیمات');
+    expect(settingsTile, findsOneWidget);
+    await tester.ensureVisible(settingsTile);
+    await tester.pumpAndSettle();
 
-    await tester.tap(find.text('تنظیمات'));
+    await tester.tap(settingsTile);
     await tester.pumpAndSettle();
     expect(find.widgetWithText(AppBar, 'تنظیمات'), findsOneWidget);
     expect(find.text('اطلاعات دیتابیس'), findsOneWidget);
