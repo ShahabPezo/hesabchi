@@ -48,6 +48,13 @@ class _InvoiceDetailSheet extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             _InfoLine(label: 'نوع عملیات', value: item.title),
+            if (item.grossWeight != null) ...[
+              const SizedBox(height: 12),
+              _InfoLine(
+                label: 'وزن ناخالص',
+                value: formatNumber(item.grossWeight!),
+              ),
+            ],
             const SizedBox(height: 12),
             _InfoLine(label: 'وزن خالص', value: formatNumber(item.quantity)),
             const SizedBox(height: 12),

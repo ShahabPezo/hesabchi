@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namayeshyar/data/models.dart';
+import 'package:namayeshyar/screens/customer_directory_screen.dart';
 import 'package:namayeshyar/screens/employee_salary_screen.dart';
 import 'package:namayeshyar/screens/home_screen.dart';
 import 'package:namayeshyar/screens/main_shell.dart';
@@ -30,6 +31,39 @@ void main() {
     "prices": [
       {"id": "P-1", "title": "کالا", "sku": "A1", "price": 120000, "updatedAt": "2026-08-20T10:00:00Z"}
     ]
+  }
+  ''';
+
+  const _directoryJson = '''
+  {
+    "version": 1,
+    "exportedAt": "2026-08-20T10:30:00Z",
+    "business": {"name": "کسب‌وکار آزمایشی", "currency": "IRR"},
+    "customers": [
+      {"id": "C-1", "name": "مشتری آزمایشی", "phone": "", "balance": 120000, "updatedAt": "2026-08-20T10:00:00Z"},
+      {"id": "C-2", "name": "مشتری بدون فاکتور", "phone": "", "balance": 0, "updatedAt": "2026-08-20T10:00:00Z"}
+    ],
+    "invoices": [
+      {
+        "id": "I-1", "customerId": "C-1", "customerName": "مشتری آزمایشی",
+        "issuedAt": "2026-06-10T00:00:00Z", "dueAt": "2026-06-15T00:00:00Z",
+        "total": 60000, "paid": 0, "status": "unpaid",
+        "items": [{"title": "کالا", "quantity": 1, "unitPrice": 60000, "total": 60000}]
+      },
+      {
+        "id": "I-2", "customerId": "C-1", "customerName": "مشتری آزمایشی",
+        "issuedAt": "2026-08-19T00:00:00Z", "dueAt": "2026-08-25T00:00:00Z",
+        "total": 120000, "paid": 0, "status": "unpaid",
+        "items": [{"title": "کالا", "quantity": 1, "unitPrice": 120000, "total": 120000}]
+      },
+      {
+        "id": "I-3", "customerId": "C-1", "customerName": "مشتری آزمایشی",
+        "issuedAt": "2026-07-01T00:00:00Z", "dueAt": "2026-07-05T00:00:00Z",
+        "total": 30000, "paid": 0, "status": "unpaid",
+        "items": [{"title": "کالا", "quantity": 1, "unitPrice": 30000, "total": 30000}]
+      }
+    ],
+    "prices": []
   }
   ''';
 
@@ -107,6 +141,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('حقوق افراد'), findsOneWidget);
     expect(find.text('فاکتورهای مشتری'), findsOneWidget);
+    expect(find.text('دفترچه مشتریان'), findsOneWidget);
     expect(find.text('وضعیت فروشگاه‌ها'), findsOneWidget);
     final settingsTile = find.widgetWithText(ListTile, 'تنظیمات');
     expect(settingsTile, findsOneWidget);
@@ -236,6 +271,49 @@ void main() {
 
     expect(find.text('فروشگاه تست'), findsWidgets);
     expect(find.text('وضعیت اجاره'), findsOneWidget);
+  });
+
+  test('گروگذاری فاکتور برای هر مشتری در دفترچه مشتریان محاسبه می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(_directoryJson);
+
+    expect(dataset.customers, hasLength(2));
+    expect(dataset.invoices, hasLength(3));
+  });
+
+  test('فیلد اختیاری grossWeight آیتم فاکتور خوانده می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(
+      validJson.replaceFirst(
+        '{"title": "کالا", "quantity": 1, "unitPrice": 120000, "total": 120000}',
+        '{"title": "کالا", "quantity": 1, "grossWeight": 5, "unitPrice": 120000, "total": 120000}',
+      ),
+    );
+
+    expect(dataset.invoices.single.items.single.grossWeight, 5);
+  });
+
+  test('نبود grossWeight در فایل قدیمی خطا ایجاد نمی‌کند', () {
+    final dataset = BusinessDataset.fromRawJson(validJson);
+
+    expect(dataset.invoices.single.items.single.grossWeight, isNull);
+  });
+
+  testWidgets('دفترچه مشتریان مشتری بدون فاکتور را هم نشان می‌دهد', (
+    tester,
+  ) async {
+    final controller = _DatasetController(
+      BusinessDataset.fromRawJson(_directoryJson),
+    );
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      ChangeNotifierProvider<AppController>.value(
+        value: controller,
+        child: const MaterialApp(home: CustomerDirectoryScreen()),
+      ),
+    );
+
+    expect(find.text('مشتری آزمایشی'), findsOneWidget);
+    expect(find.text('مشتری بدون فاکتور'), findsOneWidget);
+    expect(find.text('بدون فاکتور ثبت‌شده'), findsOneWidget);
   });
 
   test('فاکتور با مشتری ناشناخته رد می‌شود', () {

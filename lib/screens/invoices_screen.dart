@@ -222,6 +222,7 @@ class InvoiceDetailScreen extends StatelessWidget {
     final operationType = item?.title.trim().isNotEmpty == true
         ? item!.title
         : 'ثبت نشده';
+    final grossWeight = item?.grossWeight;
     final netWeight = item == null ? 'ثبت نشده' : formatNumber(item.quantity);
     final unitPrice = item == null ? 'ثبت نشده' : formatMoney(item.unitPrice);
 
@@ -255,6 +256,13 @@ class InvoiceDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _DetailLine(label: 'نوع عملیات', value: operationType),
+                  if (grossWeight != null) ...[
+                    const SizedBox(height: 12),
+                    _DetailLine(
+                      label: 'وزن ناخالص',
+                      value: formatNumber(grossWeight),
+                    ),
+                  ],
                   const SizedBox(height: 12),
                   _DetailLine(label: 'وزن خالص', value: netWeight),
                   const SizedBox(height: 12),

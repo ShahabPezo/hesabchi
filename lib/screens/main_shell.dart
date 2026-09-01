@@ -6,6 +6,7 @@ import 'customers_screen.dart';
 import 'employee_salary_screen.dart';
 import 'home_screen.dart';
 import 'invoices_screen.dart';
+import 'customer_directory_screen.dart';
 import 'prices_screen.dart';
 import 'settings_screen.dart';
 import 'statistics_screen.dart';
@@ -27,7 +28,13 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-enum _MoreDestination { employeeSalary, invoices, storeStatus, settings }
+enum _MoreDestination {
+  employeeSalary,
+  invoices,
+  customerDirectory,
+  storeStatus,
+  settings,
+}
 
 class _MainShellState extends State<MainShell> {
   var _index = 0;
@@ -135,6 +142,15 @@ class _MainShellState extends State<MainShell> {
               ),
               const Divider(height: 1),
               _MoreMenuTile(
+                icon: Icons.contacts_outlined,
+                title: 'دفترچه مشتریان',
+                subtitle: 'همه‌ی مشتریانی که تا امروز فعالیت داشته‌اند',
+                onTap: () => Navigator.of(
+                  sheetContext,
+                ).pop(_MoreDestination.customerDirectory),
+              ),
+              const Divider(height: 1),
+              _MoreMenuTile(
                 icon: Icons.storefront_outlined,
                 title: 'وضعیت فروشگاه‌ها',
                 subtitle: 'بار، اجاره و فاکتورهای ورود کارتن فروشگاهی',
@@ -166,6 +182,10 @@ class _MainShellState extends State<MainShell> {
           _MoreDestination.invoices => Scaffold(
             appBar: AppBar(title: const Text('فاکتورهای مشتری')),
             body: const InvoicesScreen(),
+          ),
+          _MoreDestination.customerDirectory => Scaffold(
+            appBar: AppBar(title: const Text('دفترچه مشتریان')),
+            body: const CustomerDirectoryScreen(),
           ),
           _MoreDestination.storeStatus => Scaffold(
             appBar: AppBar(title: const Text('وضعیت فروشگاه‌ها')),

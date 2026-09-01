@@ -532,12 +532,15 @@ class InvoiceItem {
     required this.quantity,
     required this.unitPrice,
     required this.total,
+    this.grossWeight,
   });
 
   final String title;
   final num quantity;
   final int unitPrice;
   final int total;
+  // فیلد اختیاری؛ فایل‌های HCH قدیمی‌تر (پیش از افزودن این قابلیت در ویندوز) این کلید را ندارند.
+  final num? grossWeight;
 
   factory InvoiceItem.fromJson(Map<String, dynamic> json) {
     return InvoiceItem(
@@ -545,6 +548,10 @@ class InvoiceItem {
       quantity: _requiredNumber(json, 'quantity', scope: 'آیتم فاکتور'),
       unitPrice: _requiredInteger(json, 'unitPrice', scope: 'آیتم فاکتور'),
       total: _requiredInteger(json, 'total', scope: 'آیتم فاکتور'),
+      grossWeight: _optionalNonNegativeNumber(
+        json['grossWeight'],
+        scope: 'آیتم فاکتور',
+      ),
     );
   }
 }
@@ -1086,6 +1093,27 @@ int? _optionalInteger(dynamic value, {required String scope}) {
     return int.tryParse(value.trim()) ?? _numberError('مقدار اختیاری', scope);
   }
   throw ImportValidationException('یکی از مقادیر $scope باید عدد صحیح باشد.');
+}
+
+num? _optionalNonNegativeNumber(dynamic value, {required String scope}) {
+  // فیلدهای اختیاری در فایل‌های HCH قدیمی‌تر ممکن است اصلاً وجود نداشته باشند.
+  if (value == null || (value is String && value.trim().isEmpty)) return null;
+  num? number;
+  if (value is num) {
+    number = value;
+  } else if (value is String) {
+    number = num.tryParse(value);
+  }
+  if (number == null) {
+    throw ImportValidationException('یکی از مقادیر $scope باید عددی باشد.');
+  }
+  if (number < 0) {
+    throw ImportValidationException('یکی از مقادیر $scope نمی‌تواند منفی باشد.');
+  }
+  // مقدار صفر یا منفی برای وزن ناخالص یعنی داده معتبری ثبت نشده؛ نامعتبر تلقی نمی‌شود
+  // ولی به‌عنوان «موجود نیست» در نظر گرفته می‌شود تا نمایش گمراه‌کننده رخ ندهد.
+  if (number == 0) return null;
+  return number;
 }
 
 String _requiredJalaliDateText(
