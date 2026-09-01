@@ -8,6 +8,9 @@ on:
 permissions:
   contents: write
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,7 +29,22 @@ jobs:
         run: dart format --output=none --set-exit-if-changed lib test || true
 
       - name: Analyze
-        run: flutter analyze
+        run: flutter analyze > /tmp/analyze_output.txt 2>&1 || (echo "ANALYZE_FAILED=1" >> "$GITHUB_ENV"; true)
+
+      - name: Save analyze log to repo on failure
+        if: env.ANALYZE_FAILED == '1'
+        run: |
+          mkdir -p .ci
+          cp /tmp/analyze_output.txt .ci/last_test_output.txt
+          git config user.email "ci@hesabchi.local"
+          git config user.name "Hesabchi CI"
+          git add .ci/last_test_output.txt
+          git commit -m "ci: save failing analyze log [skip ci]" || true
+          git push || true
+
+      - name: Fail if analyze failed
+        if: env.ANALYZE_FAILED == '1'
+        run: exit 1
 
       - name: Test
         run: flutter test > /tmp/test_output.txt 2>&1 || (echo "TEST_FAILED=1" >> "$GITHUB_ENV"; true)
