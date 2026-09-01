@@ -307,7 +307,9 @@ void main() {
     await tester.pumpWidget(
       ChangeNotifierProvider<AppController>.value(
         value: controller,
-        child: const MaterialApp(home: CustomerDirectoryScreen()),
+        child: MaterialApp(
+          home: Scaffold(body: const CustomerDirectoryScreen()),
+        ),
       ),
     );
 
