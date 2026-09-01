@@ -1,0 +1,262 @@
+Resolving dependencies...
+Downloading packages...
+  clock 1.1.2 (1.1.3 available)
+  code_assets 1.2.1 (2.0.0 available)
+  cross_file 0.3.5+4 (0.3.5+5 available)
+  file_picker 10.3.10 (12.1.2 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  objective_c 9.5.0 (9.6.0 available)
+  pub_semver 2.2.0 (2.2.1 available)
+  record_use 0.6.0 (1.1.1 available)
+  shared_preferences_android 2.4.27 (2.4.28 available)
+  shared_preferences_foundation 2.5.6 (2.5.7 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test_api 0.7.12 (0.7.13 available)
+  url_launcher_android 6.3.32 (6.3.33 available)
+  url_launcher_ios 6.4.1 (6.4.2 available)
+  url_launcher_linux 3.2.2 (3.2.3 available)
+  url_launcher_macos 3.2.5 (3.2.6 available)
+  url_launcher_windows 3.1.5 (3.1.6 available)
+  vector_math 2.4.0 (2.4.2 available)
+  win32 5.15.0 (6.4.0 available)
+  yaml 3.1.3 (3.1.4 available)
+Got dependencies!
+22 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+::group::✅ Passing tests
+✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: فرمول حقوق و تسویه بازه جلالی عین داده راهنما محاسبه می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: رکورد یک روز پیش از ابتدای بازه برای حقوق و تسویه معتبر است
+✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: مانده صفرِ فاقد تاریخ تسویه از HCH قدیمی معتبر می‌ماند
+✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: دوره متنی واریزی HCH قدیمی ویندوز به عدد canonical تبدیل می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: تا انتخاب کامل کارمند و بازه، محاسبه صفر باقی می‌ماند
+✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: متادیتا و HCH جدید GitHub دریافت و اعتبارسنجی اندازه می‌شوند
+✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: اگر خروجی GitHub جدیدتر نباشد، HCH کامل دریافت نمی‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: خطای شبکه GitHub به خطای کنترل‌شده تبدیل می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: HCH جدید فقط پس از اعتبارسنجی کامل جایگزین snapshot قبلی می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: HCH نامعتبر دریافت‌شده، snapshot قبلی گوشی را تغییر نمی‌دهد
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: داده نسخه یک معتبر تحلیل و نگهداری می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: بازه فاکتورها از کلید scope فایل HCH خوانده می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تب خانه با فایل قدیمی بدون scope رندر می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تب خانه با فایل بازه‌دار بدون توقف رندر می‌کند
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: داده وضعیت ماهانه HCH خوانده و بر اساس ماه مرتب می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تب آمار برای فایل HCH قدیمی حالت خالی سازگار نشان می‌دهد
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تب آمار جدیدترین ماه و مشتری برتر را رندر می‌کند
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: آمار و گزینه‌های منوی بیشتر در دسترس‌اند
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: داده اختیاری حقوق افراد HCH خوانده می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: صفحه حقوق افراد برای HCH قدیمی بدون داده کرش نمی‌کند
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تنظیمات با داده پاک‌شده رندر خطرناک ندارد
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نسخه پشتیبانی‌نشده با خطای قابل فهم رد می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: داده اختیاری وضعیت فروشگاه‌ها HCH خوانده می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نبود وضعیت فروشگاه‌ها در HCH قدیمی خطا ایجاد نمی‌کند
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: صفحه وضعیت فروشگاه‌ها برای HCH قدیمی بدون داده کرش نمی‌کند
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: صفحه وضعیت فروشگاه‌ها فاکتور ورود کارتن را نشان می‌دهد
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: گروگذاری فاکتور برای هر مشتری در دفترچه مشتریان محاسبه می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: فیلد اختیاری grossWeight آیتم فاکتور خوانده می‌شود
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نبود grossWeight در فایل قدیمی خطا ایجاد نمی‌کند
+::endgroup::
+::group::❌ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: دفترچه مشتریان مشتری بدون فاکتور را هم نشان می‌دهد (failed)
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building TextField(controller:
+TextEditingController#88483(TextEditingValue(text: ┤├, selection: TextSelection.invalid, composing:
+TextRange(start: -1, end: -1))), decoration: InputDecoration(hintText: "نام، شماره تلفن مشتری",
+prefixIcon: Icon(IconData(U+0E567))), dirty, dependencies: [MediaQuery, UnmanagedRestorationScope],
+state: _TextFieldState#03807):
+No Material widget found.
+TextField widgets require a Material widget ancestor within the closest LookupBoundary.
+In Material Design, most widgets are conceptually "printed" on a sheet of material. In Flutter's
+material library, that material is represented by the Material widget. It is the Material widget
+that renders ink splashes, for instance. Because of this, many material library widgets require that
+there be a Material widget in the tree above them.
+To introduce a Material widget, you can either directly include one, or use a widget that contains
+Material itself, such as a Card, Dialog, Drawer, or Scaffold.
+The specific widget that could not find a Material ancestor was:
+  TextField
+The ancestors of this widget were:
+  ...
+  Padding
+  Column
+  CustomerDirectoryScreen
+  Semantics
+  Builder
+  ...
+
+The relevant error-causing widget was:
+  TextField
+  TextField:file:///home/runner/work/hesabchi/hesabchi/lib/screens/customer_directory_screen.dart:51:18
+
+When the exception was thrown, this was the stack:
+#0      debugCheckHasMaterial.<anonymous closure> (package:flutter/src/material/debug.dart:40:7)
+#1      debugCheckHasMaterial (package:flutter/src/material/debug.dart:67:4)
+#2      _TextFieldState.build (package:flutter/src/material/text_field.dart:1531:12)
+#3      StatefulElement.build (package:flutter/src/widgets/framework.dart:5944:27)
+#4      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5830:15)
+#5      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5995:11)
+#6      Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#7      ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5812:5)
+#8      StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5986:11)
+#9      ComponentElement.mount (package:flutter/src/widgets/framework.dart:5806:5)
+...     Normal element mounting (4 frames)
+#13     Element.inflateWidget (package:flutter/src/widgets/framework.dart:4600:20)
+#14     MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7277:36)
+#15     MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7292:32)
+...     Normal element mounting (268 frames)
+#283    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4600:20)
+#284    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7277:36)
+#285    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7292:32)
+...     Normal element mounting (473 frames)
+#758    _InheritedProviderScopeElement.mount (package:provider/src/inherited_provider.dart:424:11)
+...     Normal element mounting (7 frames)
+#765    SingleChildWidgetElementMixin.mount (package:nested/nested.dart:222:11)
+#766    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4600:20)
+#767    Element.updateChild (package:flutter/src/widgets/framework.dart:4066:20)
+#768    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#769    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#770    ProxyElement.update (package:flutter/src/widgets/framework.dart:6162:5)
+#771    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#772    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#773    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#774    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5995:11)
+#775    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#776    StatefulElement.update (package:flutter/src/widgets/framework.dart:6020:5)
+#777    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#778    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#779    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#780    ProxyElement.update (package:flutter/src/widgets/framework.dart:6162:5)
+#781    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#782    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#783    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#784    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5995:11)
+#785    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#786    StatefulElement.update (package:flutter/src/widgets/framework.dart:6020:5)
+#787    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#788    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#789    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5995:11)
+#790    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#791    StatefulElement.update (package:flutter/src/widgets/framework.dart:6020:5)
+#792    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#793    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#794    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#795    ProxyElement.update (package:flutter/src/widgets/framework.dart:6162:5)
+#796    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#797    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#798    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5995:11)
+#799    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#800    StatefulElement.update (package:flutter/src/widgets/framework.dart:6020:5)
+#801    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#802    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#803    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#804    ProxyElement.update (package:flutter/src/widgets/framework.dart:6162:5)
+#805    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#806    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#807    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#808    ProxyElement.update (package:flutter/src/widgets/framework.dart:6162:5)
+#809    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#810    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:488:16)
+#811    _RawViewElement.update (package:flutter/src/widgets/view.dart:575:5)
+#812    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#813    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#814    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#815    StatelessElement.update (package:flutter/src/widgets/framework.dart:5908:5)
+#816    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#817    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5854:16)
+#818    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5995:11)
+#819    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#820    StatefulElement.update (package:flutter/src/widgets/framework.dart:6020:5)
+#821    Element.updateChild (package:flutter/src/widgets/framework.dart:4050:15)
+#822    RootElement._rebuild (package:flutter/src/widgets/binding.dart:2091:16)
+#823    RootElement.update (package:flutter/src/widgets/binding.dart:2069:5)
+#824    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:2083:7)
+#825    Element.rebuild (package:flutter/src/widgets/framework.dart:5542:7)
+#826    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2763:15)
+#827    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2820:11)
+#828    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3124:18)
+#829    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2432:19)
+#830    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:558:5)
+#831    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#832    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#833    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:2261:9)
+#836    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#837    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:2250:27)
+#838    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#841    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#842    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#843    main.<anonymous closure> (file:///home/runner/work/hesabchi/hesabchi/test/widget_test.dart:307:18)
+#844    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+<asynchronous suspension>
+#845    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 5 frames from dart:async and package:stack_trace)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 99452 pixels on the bottom.
+
+The relevant error-causing widget was:
+  Column
+  Column:file:///home/runner/work/hesabchi/hesabchi/lib/screens/customer_directory_screen.dart:47:12
+
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#62626 OVERFLOWING:
+  needs compositing
+  creator: Column ← CustomerDirectoryScreen ← Semantics ← Builder ← RepaintBoundary-[GlobalKey#a0ba4]
+    ← IgnorePointer ← ListenableBuilder ← FractionalTranslation ← SlideTransition ← FadeTransition ←
+    FractionalTranslation ← SlideTransition ← ⋯
+  parentData: <none> (can use size)
+  constraints: BoxConstraints(w=800.0, h=600.0)
+  size: Size(800.0, 600.0)
+  direction: vertical
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextWidgetFinder:<Found 0 widgets with text "مشتری آزمایشی": []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///home/runner/work/hesabchi/hesabchi/test/widget_test.dart:314:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///home/runner/work/hesabchi/hesabchi/test/widget_test.dart line 314
+The test description was:
+  دفترچه مشتریان مشتری بدون فاکتور را هم نشان می‌دهد
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (3) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Test failed. See exception logs above.
+The test description was: دفترچه مشتریان مشتری بدون فاکتور را هم نشان می‌دهد
+
+::endgroup::
+::group::✅ Passing tests
+✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: فاکتور با مشتری ناشناخته رد می‌شود
+::endgroup::
+
+::error::30 tests passed, 1 failed.
