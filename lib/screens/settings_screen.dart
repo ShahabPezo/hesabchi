@@ -79,7 +79,7 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        const SectionHeader(title: 'داده‌ها'),
+        const SectionHeader(title: 'مدیریت داده‌ها'),
         const SizedBox(height: 8),
         Card(
           child: Column(
@@ -89,11 +89,11 @@ class SettingsScreen extends StatelessWidget {
                   Icons.cloud_download_outlined,
                   color: AppColors.primary,
                 ),
-                title: const Text('دریافت به‌روزرسانی'),
+                title: const Text('دریافت آنلاین به‌روزرسانی'),
                 subtitle: Text(
                   controller.isSyncing
                       ? 'در حال دریافت اطلاعات…'
-                      : 'دریافت آخرین اطلاعات از حسابچی',
+                      : 'دریافت آخرین اطلاعات گیت‌هاب برای حسابچی',
                 ),
                 trailing: controller.isSyncing
                     ? const SizedBox(
@@ -110,7 +110,7 @@ class SettingsScreen extends StatelessWidget {
                   Icons.upload_file_outlined,
                   color: AppColors.primary,
                 ),
-                title: const Text('ورود فایل جدید'),
+                title: const Text('دریافت به‌روزرسانی آفلاین'),
                 subtitle: const Text('جایگزین‌کردن اطلاعات با فایل HCH معتبر'),
                 trailing: const Icon(Icons.chevron_left),
                 onTap: onImport,

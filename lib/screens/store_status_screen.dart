@@ -181,15 +181,6 @@ class _StoreStatusScreenState extends State<StoreStatusScreen> {
           ),
         ),
         const SizedBox(height: 24),
-        const SectionHeader(title: 'وضعیت اجاره'),
-        const SizedBox(height: 10),
-        if (rentalStatus == null)
-          const EmptyListNotice(
-            text: 'این فروشگاه قرارداد اجاره‌ی فعالی ندارد.',
-          )
-        else
-          _RentalStatusCard(rentalStatus: rentalStatus),
-        const SizedBox(height: 24),
         SectionHeader(
           title: 'فاکتورها (${formatNumber(filteredEntries.length)})',
         ),
@@ -213,6 +204,15 @@ class _StoreStatusScreenState extends State<StoreStatusScreen> {
               ),
             ),
           ),
+        const SizedBox(height: 24),
+        const SectionHeader(title: 'وضعیت اجاره'),
+        const SizedBox(height: 10),
+        if (rentalStatus == null)
+          const EmptyListNotice(
+            text: 'این فروشگاه قرارداد اجاره‌ی فعالی ندارد.',
+          )
+        else
+          _RentalStatusCard(rentalStatus: rentalStatus),
       ],
     );
   }

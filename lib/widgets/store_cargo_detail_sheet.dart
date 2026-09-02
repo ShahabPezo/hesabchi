@@ -39,7 +39,7 @@ class _StoreCargoDetailSheet extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              'شماره ثبت: ${entry.id}',
+              'شماره فاکتور: ${_formatCargoInvoiceNumber(entry.id)}',
               style: Theme.of(context).textTheme.bodyMedium
                   ?.copyWith(color: AppColors.mutedText),
             ),
@@ -56,9 +56,16 @@ class _StoreCargoDetailSheet extends StatelessWidget {
               value: formatWeight(entry.netWeightKg),
               emphasized: true,
             ),
+            if (entry.driverName.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _InfoLine(label: 'نام راننده', value: entry.driverName),
+            ],
             if (entry.plateOrHelper.isNotEmpty) ...[
               const SizedBox(height: 12),
-              _InfoLine(label: 'پلاک یا نام کارگر', value: entry.plateOrHelper),
+              _InfoLine(
+                label: 'نام کارگر یا کمکی',
+                value: entry.plateOrHelper,
+              ),
             ],
             if (entry.description.isNotEmpty) ...[
               const SizedBox(height: 12),
@@ -69,6 +76,14 @@ class _StoreCargoDetailSheet extends StatelessWidget {
       ),
     );
   }
+}
+
+// شناسه‌ی داخلی کارتن فروشگاهی به فرمت «SC-<عدد>» است؛ برای همخوانی با فاکتورهای
+// مشتری («INV-<عدد>») در نمایش به کاربر، پیشوند به شکل «INV-<عدد>» بازنویسی می‌شود.
+String _formatCargoInvoiceNumber(String id) {
+  final match = RegExp(r'(\d+)(?!.*\d)').firstMatch(id);
+  if (match == null) return id;
+  return 'INV-${match.group(1)}';
 }
 
 class _InfoLine extends StatelessWidget {

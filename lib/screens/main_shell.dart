@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../app_theme.dart';
+import '../state/app_controller.dart';
 import 'customers_screen.dart';
 import 'employee_salary_screen.dart';
 import 'home_screen.dart';
@@ -44,6 +46,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final isSyncing = context.watch<AppController>().isSyncing;
     final pages = [
       HomeScreen(onImport: widget.onImport),
       const CustomersScreen(),
@@ -57,12 +60,22 @@ class _MainShellState extends State<MainShell> {
         appBar: AppBar(
           title: Text(_titles[_index]),
           actions: [
-            if (_index != 3)
-              IconButton(
-                tooltip: 'ورود فایل جدید',
-                onPressed: widget.onImport,
-                icon: const Icon(Icons.file_upload_outlined),
-              ),
+            IconButton(
+              tooltip: 'دریافت آنلاین به‌روزرسانی',
+              onPressed: isSyncing ? null : widget.onSync,
+              icon: isSyncing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.cloud_download_outlined),
+            ),
+            IconButton(
+              tooltip: 'دریافت به‌روزرسانی آفلاین',
+              onPressed: widget.onImport,
+              icon: const Icon(Icons.upload_file_outlined),
+            ),
           ],
         ),
         body: AnimatedSwitcher(

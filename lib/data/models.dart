@@ -693,6 +693,7 @@ class StoreCargoEntry {
     required this.plateOrHelper,
     required this.description,
     required this.createdAt,
+    this.driverName = '',
   });
 
   final String id;
@@ -704,6 +705,8 @@ class StoreCargoEntry {
   final String plateOrHelper;
   final String description;
   final DateTime createdAt;
+  // فیلد اختیاری؛ فایل‌های HCH فعلی این کلید را هنوز صادر نمی‌کنند (در انتظار تغییر ویندوز).
+  final String driverName;
 
   factory StoreCargoEntry.fromJson(Map<String, dynamic> json) {
     const scope = 'ورود کارتن فروشگاهی';
@@ -722,6 +725,7 @@ class StoreCargoEntry {
         'netWeightKg',
         scope: scope,
       ),
+      driverName: _optionalText(json['driverName']),
       plateOrHelper: _optionalText(json['plateOrHelper']),
       description: _optionalText(json['description']),
       createdAt: _requiredDate(json, 'createdAt', scope: scope),
