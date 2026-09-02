@@ -241,6 +241,12 @@ class CustomerDetailScreen extends StatelessWidget {
           ..sort(_compareCustomerInvoicesByNumberDescending);
     final balanceLabel = _balanceLabel(customer.balance);
     final balanceColor = _balanceColor(customer.balance);
+    DateTime? lastInvoiceDate;
+    for (final invoice in invoices) {
+      if (lastInvoiceDate == null || invoice.issuedAt.isAfter(lastInvoiceDate)) {
+        lastInvoiceDate = invoice.issuedAt;
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('جزئیات مشتری')),
@@ -326,7 +332,9 @@ class CustomerDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'آخرین به‌روزرسانی: ${formatJalaliDate(customer.updatedAt)}',
+                    lastInvoiceDate == null
+                        ? 'بدون فاکتور ثبت‌شده'
+                        : 'آخرین فاکتور: ${formatJalaliDate(lastInvoiceDate)}',
                     style: Theme.of(context).textTheme.bodySmall
                         ?.copyWith(color: AppColors.mutedText),
                   ),

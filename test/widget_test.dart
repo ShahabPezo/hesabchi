@@ -302,6 +302,27 @@ void main() {
     expect(dataset.invoices.single.items.single.grossWeight, isNull);
   });
 
+  test('فیلد اختیاری phones مشتری خوانده می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(
+      validJson.replaceFirst(
+        '{"id": "C-1", "name": "مشتری آزمایشی", "phone": "", "balance": 120000, "updatedAt": "2026-08-20T10:00:00Z"}',
+        '{"id": "C-1", "name": "مشتری آزمایشی", "phone": "09120000000", "phones": ["09120000000", "09121111111", "09120000000"], "balance": 120000, "updatedAt": "2026-08-20T10:00:00Z"}',
+      ),
+    );
+
+    expect(dataset.customers.single.phones, [
+      '09120000000',
+      '09121111111',
+    ]);
+  });
+
+  test('نبود phones در فایل قدیمی از phone تکی ساخته می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(validJson);
+
+    expect(dataset.customers.single.phones, isEmpty);
+    expect(dataset.customers.single.phone, isEmpty);
+  });
+
   testWidgets('دفترچه مشتریان مشتری بدون فاکتور را هم نشان می‌دهد', (
     tester,
   ) async {

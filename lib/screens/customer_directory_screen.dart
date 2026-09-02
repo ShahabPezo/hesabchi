@@ -41,7 +41,7 @@ class _CustomerDirectoryScreenState extends State<CustomerDirectoryScreen> {
     final visible = entries.where((entry) {
       return query.isEmpty ||
           entry.customer.name.toLowerCase().contains(query) ||
-          entry.customer.phone.contains(query);
+          entry.customer.phones.any((phone) => phone.contains(query));
     }).toList();
 
     return Column(
@@ -123,15 +123,24 @@ class _CustomerDirectoryScreenState extends State<CustomerDirectoryScreen> {
   }
 }
 
-class _DirectoryCard extends StatelessWidget {
+class _DirectoryCard extends StatefulWidget {
   const _DirectoryCard({required this.entry});
 
   final _DirectoryEntry entry;
 
   @override
+  State<_DirectoryCard> createState() => _DirectoryCardState();
+}
+
+class _DirectoryCardState extends State<_DirectoryCard> {
+  late String? _selectedPhone = widget.entry.customer.phones.isEmpty
+      ? null
+      : widget.entry.customer.phones.first;
+
+  @override
   Widget build(BuildContext context) {
-    final customer = entry.customer;
-    final lastInvoice = entry.lastInvoice;
+    final customer = widget.entry.customer;
+    final lastInvoice = widget.entry.lastInvoice;
     return Card(
       child: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 12, 14),
@@ -170,13 +179,41 @@ class _DirectoryCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (customer.phone.isNotEmpty)
+            if (customer.phones.isNotEmpty) ...[
+              SizedBox(
+                width: 118,
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedPhone,
+                    isDense: true,
+                    isExpanded: true,
+                    icon: const Icon(Icons.expand_more, size: 18),
+                    style: Theme.of(context).textTheme.bodySmall,
+                    items: customer.phones
+                        .map(
+                          (phone) => DropdownMenuItem(
+                            value: phone,
+                            child: Text(
+                              phone,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(growable: false),
+                    onChanged: (value) =>
+                        setState(() => _selectedPhone = value),
+                  ),
+                ),
+              ),
               IconButton(
                 tooltip: 'تماس با ${customer.name}',
                 icon: const Icon(Icons.call_outlined, color: AppColors.primary),
-                onPressed: () => _openDirectoryDialer(context, customer.phone),
-              )
-            else
+                onPressed: _selectedPhone == null
+                    ? null
+                    : () => _openDirectoryDialer(context, _selectedPhone!),
+              ),
+            ] else
               const SizedBox(width: 4),
           ],
         ),

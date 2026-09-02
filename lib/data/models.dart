@@ -505,6 +505,7 @@ class Customer {
     required this.id,
     required this.name,
     required this.phone,
+    required this.phones,
     required this.balance,
     required this.updatedAt,
   });
@@ -512,14 +513,31 @@ class Customer {
   final String id;
   final String name;
   final String phone;
+  // لیست همه‌ی شماره‌های ثبت‌شده؛ در فایل‌های HCH قدیمی‌تر (بدون فیلد phones) از همان phone
+  // تکی ساخته می‌شود تا رفتار قبلی حفظ شود.
+  final List<String> phones;
   final int balance;
   final DateTime updatedAt;
 
   factory Customer.fromJson(Map<String, dynamic> json) {
+    final phone = _optionalText(json['phone']);
+    final rawPhones = json['phones'];
+    List<String> phones;
+    if (rawPhones is List) {
+      final seen = <String>{};
+      phones = [
+        for (final item in rawPhones)
+          if (item != null && item.toString().trim().isNotEmpty)
+            item.toString().trim(),
+      ].where(seen.add).toList(growable: false);
+    } else {
+      phones = phone.isEmpty ? const [] : [phone];
+    }
     return Customer(
       id: _requiredText(json, 'id', scope: 'مشتری'),
       name: _requiredText(json, 'name', scope: 'مشتری'),
-      phone: _optionalText(json['phone']),
+      phone: phone,
+      phones: phones,
       balance: _requiredInteger(json, 'balance', scope: 'مشتری'),
       updatedAt: _requiredDate(json, 'updatedAt', scope: 'مشتری'),
     );
