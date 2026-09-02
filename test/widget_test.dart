@@ -270,6 +270,11 @@ void main() {
     );
 
     expect(find.text('فروشگاه تست'), findsWidgets);
+    await tester.dragUntilVisible(
+      find.text('وضعیت اجاره'),
+      find.byType(Scrollable).first,
+      const Offset(0, -200),
+    );
     expect(find.text('وضعیت اجاره'), findsOneWidget);
   });
 
