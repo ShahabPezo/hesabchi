@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:namayeshyar/data/employee_salary_calculator.dart';
 import 'package:namayeshyar/data/models.dart';
 import 'package:namayeshyar/screens/customer_directory_screen.dart';
 import 'package:namayeshyar/screens/employee_salary_screen.dart';
@@ -10,6 +11,7 @@ import 'package:namayeshyar/screens/statistics_screen.dart';
 import 'package:namayeshyar/screens/store_status_screen.dart';
 import 'package:namayeshyar/state/app_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 
 void main() {
   const validJson = '''
@@ -160,6 +162,93 @@ void main() {
     expect(dataset.employeeSalaries, hasLength(1));
     expect(dataset.employeeSalaries.single.name, 'علی رضایی');
     expect(dataset.employeeSalaries.single.extraServices, hasLength(3));
+    expect(dataset.employeeSalaries.single.hireDate, isNull);
+    expect(dataset.employeeSalaries.single.terminationDate, isNull);
+  });
+
+  test('فیلدهای اختیاری hireDate/terminationDate کارمند خوانده می‌شوند', () {
+    final dataset = BusinessDataset.fromRawJson(
+      _employeeSalaryJson(validJson).replaceFirst(
+        '"name": "علی رضایی",',
+        '"name": "علی رضایی", "hireDate": "1403/05/10", "terminationDate": "1404/06/01",',
+      ),
+    );
+
+    expect(dataset.employeeSalaries.single.hireDate, '1403/05/10');
+    expect(dataset.employeeSalaries.single.terminationDate, '1404/06/01');
+  });
+
+  test('تاریخ پایان بازه بعد از پایان همکاری محدود می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(
+      _employeeSalaryJson(validJson).replaceFirst(
+        '"name": "علی رضایی",',
+        '"name": "علی رضایی", "hireDate": "1403/05/10", "terminationDate": "1404/06/01",',
+      ),
+    );
+    final employee = dataset.employeeSalaries.single;
+
+    final result = EmployeeSalaryCalculator.clampToEmployment(
+      employee: employee,
+      start: Jalali(1404, 6, 1),
+      end: Jalali(1404, 6, 31),
+    );
+
+    expect(result.end, Jalali(1404, 6, 1));
+    expect(result.message, contains('پایان یافته'));
+  });
+
+  test('تاریخ شروع بازه قبل از شروع همکاری محدود می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(
+      _employeeSalaryJson(validJson).replaceFirst(
+        '"name": "علی رضایی",',
+        '"name": "علی رضایی", "hireDate": "1403/05/10", "terminationDate": "1404/06/01",',
+      ),
+    );
+    final employee = dataset.employeeSalaries.single;
+
+    final result = EmployeeSalaryCalculator.clampToEmployment(
+      employee: employee,
+      start: Jalali(1403, 1, 1),
+      end: Jalali(1403, 6, 30),
+    );
+
+    expect(result.start, Jalali(1403, 5, 10));
+    expect(result.message, contains('شروع همکاری'));
+  });
+
+  test('بازه‌ی داخل محدوده‌ی همکاری بدون تغییر باقی می‌ماند', () {
+    final dataset = BusinessDataset.fromRawJson(
+      _employeeSalaryJson(validJson).replaceFirst(
+        '"name": "علی رضایی",',
+        '"name": "علی رضایی", "hireDate": "1403/05/10", "terminationDate": "1404/06/01",',
+      ),
+    );
+    final employee = dataset.employeeSalaries.single;
+
+    final result = EmployeeSalaryCalculator.clampToEmployment(
+      employee: employee,
+      start: Jalali(1404, 4, 1),
+      end: Jalali(1404, 4, 30),
+    );
+
+    expect(result.start, Jalali(1404, 4, 1));
+    expect(result.end, Jalali(1404, 4, 30));
+    expect(result.message, isNull);
+  });
+
+  test('نبود hireDate/terminationDate هیچ محدودیتی اعمال نمی‌کند', () {
+    final dataset = BusinessDataset.fromRawJson(_employeeSalaryJson(validJson));
+    final employee = dataset.employeeSalaries.single;
+
+    final result = EmployeeSalaryCalculator.clampToEmployment(
+      employee: employee,
+      start: Jalali(1380, 1, 1),
+      end: Jalali(1410, 12, 29),
+    );
+
+    expect(result.start, Jalali(1380, 1, 1));
+    expect(result.end, Jalali(1410, 12, 29));
+    expect(result.message, isNull);
   });
 
   testWidgets('صفحه حقوق افراد برای HCH قدیمی بدون داده کرش نمی‌کند', (

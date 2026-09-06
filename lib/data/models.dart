@@ -320,6 +320,8 @@ class EmployeeSalary {
   const EmployeeSalary({
     required this.name,
     required this.phone,
+    required this.hireDate,
+    required this.terminationDate,
     required this.profileHistory,
     required this.offdays,
     required this.extraServices,
@@ -329,6 +331,9 @@ class EmployeeSalary {
 
   final String name;
   final String phone;
+  // فیلدهای اختیاری؛ فایل‌های HCH قدیمی‌تر این کلیدها را ندارند (null یعنی نامشخص).
+  final String? hireDate;
+  final String? terminationDate;
   final List<EmployeeProfileHistory> profileHistory;
   final List<EmployeeSalaryDatedEntry> offdays;
   final List<EmployeeSalaryDatedEntry> extraServices;
@@ -340,6 +345,11 @@ class EmployeeSalary {
     return EmployeeSalary(
       name: _requiredText(json, 'name', scope: scope),
       phone: _optionalText(json['phone']),
+      hireDate: _optionalJalaliDateText(json['hireDate'], scope: scope),
+      terminationDate: _optionalJalaliDateText(
+        json['terminationDate'],
+        scope: scope,
+      ),
       profileHistory: _optionalList(json['profileHistory'], scope: scope)
           .map(
             (item) => EmployeeProfileHistory.fromJson(

@@ -48,8 +48,75 @@ class EmployeeSalarySummary {
   };
 }
 
+class EmployeeEmploymentClampResult {
+  const EmployeeEmploymentClampResult({
+    required this.start,
+    required this.end,
+    this.message,
+  });
+
+  final Jalali? start;
+  final Jalali? end;
+  final String? message;
+}
+
 class EmployeeSalaryCalculator {
   const EmployeeSalaryCalculator._();
+
+  static Jalali? parseJalaliOrNull(String? text) {
+    if (text == null) return null;
+    final parts = text.split('/');
+    if (parts.length != 3) return null;
+    final year = int.tryParse(parts[0]);
+    final month = int.tryParse(parts[1]);
+    final day = int.tryParse(parts[2]);
+    if (year == null || month == null || day == null) return null;
+    try {
+      return Jalali(year, month, day);
+    } on Object {
+      return null;
+    }
+  }
+
+  /// اگر بازه‌ی انتخابی از محدوده‌ی همکاری کارمند (تاریخ شروع/پایان کار) بیرون بزند،
+  /// آن را به مرز مجاز محدود می‌کند و پیام توضیحی برمی‌گرداند؛ در غیر این صورت بازه
+  /// را بدون تغییر برمی‌گرداند (message خالی).
+  static EmployeeEmploymentClampResult clampToEmployment({
+    required EmployeeSalary employee,
+    required Jalali? start,
+    required Jalali? end,
+  }) {
+    final hireDate = parseJalaliOrNull(employee.hireDate);
+    final terminationDate = parseJalaliOrNull(employee.terminationDate);
+    var clampedStart = start;
+    var clampedEnd = end;
+    final messages = <String>[];
+
+    if (clampedStart != null &&
+        hireDate != null &&
+        clampedStart.julianDayNumber < hireDate.julianDayNumber) {
+      clampedStart = hireDate;
+      messages.add(
+        'شروع همکاری ${employee.name} از تاریخ ${employee.hireDate} بوده؛ '
+        'تاریخ ابتدا به همان روز تنظیم شد.',
+      );
+    }
+    if (clampedEnd != null &&
+        terminationDate != null &&
+        clampedEnd.julianDayNumber > terminationDate.julianDayNumber) {
+      clampedEnd = terminationDate;
+      messages.add(
+        'همکاری ${employee.name} در تاریخ ${employee.terminationDate} '
+        'پایان یافته؛ تاریخ انتها به همان روز تنظیم شد.',
+      );
+    }
+
+    return EmployeeEmploymentClampResult(
+      start: clampedStart,
+      end: clampedEnd,
+      message: messages.isEmpty ? null : messages.join(' '),
+    );
+  }
 
   static EmployeeSalarySummary calculate({
     required EmployeeSalary employee,

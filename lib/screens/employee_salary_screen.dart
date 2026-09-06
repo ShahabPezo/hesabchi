@@ -76,7 +76,10 @@ class _EmployeeSalaryScreenState extends State<EmployeeSalaryScreen> {
                         ),
                       )
                       .toList(growable: false),
-                  onChanged: (value) => setState(() => _employee = value),
+                  onChanged: (value) => setState(() {
+                    _employee = value;
+                    _clampSelectionToEmployee(value);
+                  }),
                 ),
                 if (selected?.phone.trim().isNotEmpty == true) ...[
                   const SizedBox(height: 8),
@@ -168,6 +171,23 @@ class _EmployeeSalaryScreenState extends State<EmployeeSalaryScreen> {
     );
   }
 
+  void _clampSelectionToEmployee(EmployeeSalary? employee) {
+    if (employee == null) return;
+    final result = EmployeeSalaryCalculator.clampToEmployment(
+      employee: employee,
+      start: _start,
+      end: _end,
+    );
+    _start = result.start;
+    _end = result.end;
+    if (result.message != null) {
+      final message = toPersianDigits(result.message!);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showClampMessage(message);
+      });
+    }
+  }
+
   Future<void> _selectDate({required bool isStart}) async {
     final current = isStart ? _start : _end;
     final chosen = await showDialog<Jalali>(
@@ -175,6 +195,24 @@ class _EmployeeSalaryScreenState extends State<EmployeeSalaryScreen> {
       builder: (context) => _JalaliDatePickerDialog(initial: current),
     );
     if (chosen == null || !mounted) return;
+
+    final employee = _employee;
+    if (employee != null) {
+      final result = EmployeeSalaryCalculator.clampToEmployment(
+        employee: employee,
+        start: isStart ? chosen : _start,
+        end: isStart ? _end : chosen,
+      );
+      if (result.message != null) {
+        setState(() {
+          _start = result.start;
+          _end = result.end;
+        });
+        _showClampMessage(toPersianDigits(result.message!));
+        return;
+      }
+    }
+
     setState(() {
       if (isStart) {
         _start = chosen;
@@ -182,6 +220,12 @@ class _EmployeeSalaryScreenState extends State<EmployeeSalaryScreen> {
         _end = chosen;
       }
     });
+  }
+
+  void _showClampMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
