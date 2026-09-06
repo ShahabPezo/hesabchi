@@ -7,6 +7,8 @@ void main() {
   const employee = EmployeeSalary(
     name: 'علی رضایی',
     phone: '09121234567',
+    hireDate: null,
+    terminationDate: null,
     profileHistory: [
       EmployeeProfileHistory(
         actionDate: '1404/03/31',
