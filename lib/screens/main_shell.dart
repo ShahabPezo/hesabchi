@@ -5,10 +5,11 @@ import 'package:provider/provider.dart';
 import '../app_theme.dart';
 import '../state/app_controller.dart';
 import 'customers_screen.dart';
+import 'customer_directory_screen.dart';
 import 'employee_salary_screen.dart';
+import 'factory_sales_screen.dart';
 import 'home_screen.dart';
 import 'invoices_screen.dart';
-import 'customer_directory_screen.dart';
 import 'prices_screen.dart';
 import 'settings_screen.dart';
 import 'statistics_screen.dart';
@@ -35,6 +36,7 @@ enum _MoreDestination {
   invoices,
   customerDirectory,
   storeStatus,
+  factorySales,
   settings,
 }
 
@@ -173,6 +175,15 @@ class _MainShellState extends State<MainShell> {
               ),
               const Divider(height: 1),
               _MoreMenuTile(
+                icon: Icons.factory_outlined,
+                title: 'فروش به کارخانه‌ها',
+                subtitle: 'وضعیت کارخانه، تریلی‌ها و فاکتورهای کرایه',
+                onTap: () => Navigator.of(
+                  sheetContext,
+                ).pop(_MoreDestination.factorySales),
+              ),
+              const Divider(height: 1),
+              _MoreMenuTile(
                 icon: Icons.settings_outlined,
                 title: 'تنظیمات',
                 subtitle: 'نمایش، داده‌ها و به‌روزرسانی',
@@ -203,6 +214,10 @@ class _MainShellState extends State<MainShell> {
           _MoreDestination.storeStatus => Scaffold(
             appBar: AppBar(title: const Text('وضعیت فروشگاه‌ها')),
             body: const StoreStatusScreen(),
+          ),
+          _MoreDestination.factorySales => Scaffold(
+            appBar: AppBar(title: const Text('فروش به کارخانه‌ها')),
+            body: const FactorySalesScreen(),
           ),
           _MoreDestination.settings => Scaffold(
             appBar: AppBar(title: const Text('تنظیمات')),

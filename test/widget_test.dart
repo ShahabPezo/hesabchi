@@ -4,6 +4,7 @@ import 'package:namayeshyar/data/employee_salary_calculator.dart';
 import 'package:namayeshyar/data/models.dart';
 import 'package:namayeshyar/screens/customer_directory_screen.dart';
 import 'package:namayeshyar/screens/employee_salary_screen.dart';
+import 'package:namayeshyar/screens/factory_sales_screen.dart';
 import 'package:namayeshyar/screens/home_screen.dart';
 import 'package:namayeshyar/screens/main_shell.dart';
 import 'package:namayeshyar/screens/settings_screen.dart';
@@ -145,6 +146,7 @@ void main() {
     expect(find.text('فاکتورهای مشتری'), findsOneWidget);
     expect(find.text('دفترچه مشتریان'), findsOneWidget);
     expect(find.text('وضعیت فروشگاه‌ها'), findsOneWidget);
+    expect(find.text('فروش به کارخانه‌ها'), findsOneWidget);
     final settingsTile = find.widgetWithText(ListTile, 'تنظیمات');
     expect(settingsTile, findsOneWidget);
     await tester.ensureVisible(settingsTile);
@@ -291,7 +293,7 @@ void main() {
   });
 
   test('نسخه پشتیبانی‌نشده با خطای قابل فهم رد می‌شود', () {
-    final unsupported = validJson.replaceFirst('"version": 1', '"version": 2');
+    final unsupported = validJson.replaceFirst('"version": 1', '"version": 3');
 
     expect(
       () => BusinessDataset.fromRawJson(unsupported),
@@ -304,6 +306,79 @@ void main() {
       ),
     );
   });
+
+  test('نسخه ۲ فایل بدون خطا پردازش می‌شود', () {
+    final v2 = validJson.replaceFirst('"version": 1', '"version": 2');
+
+    final dataset = BusinessDataset.fromRawJson(v2);
+
+    expect(dataset.version, 2);
+    expect(dataset.factorySales.entries, isEmpty);
+  });
+
+  test('داده اختیاری فروش به کارخانه‌ها HCH خوانده می‌شود', () {
+    final dataset = BusinessDataset.fromRawJson(_factorySalesJson(validJson));
+
+    expect(dataset.factorySales.factories, hasLength(1));
+    expect(dataset.factorySales.factories.single.name, 'کارخانه تست');
+    expect(dataset.factorySales.entries, hasLength(1));
+    final entry = dataset.factorySales.entries.single;
+    expect(entry.opDate, '1404/05/01');
+    expect(entry.trailerRent, 5000000);
+    expect(entry.driverName, 'راننده تست');
+  });
+
+  test('نبود فروش به کارخانه‌ها در HCH قدیمی خطا ایجاد نمی‌کند', () {
+    final dataset = BusinessDataset.fromRawJson(validJson);
+
+    expect(dataset.factorySales.factories, isEmpty);
+    expect(dataset.factorySales.entries, isEmpty);
+  });
+
+  testWidgets(
+    'صفحه فروش به کارخانه‌ها برای HCH قدیمی بدون داده کرش نمی‌کند',
+    (tester) async {
+      final controller = _DatasetController(
+        BusinessDataset.fromRawJson(validJson),
+      );
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        ChangeNotifierProvider<AppController>.value(
+          value: controller,
+          child: MaterialApp(
+            home: Scaffold(body: const FactorySalesScreen()),
+          ),
+        ),
+      );
+
+      expect(
+        find.text('داده‌ای برای فروش به کارخانه‌ها در این فایل موجود نیست.'),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'صفحه فروش به کارخانه‌ها وضعیت کارخانه و تریلی‌ها را نشان می‌دهد',
+    (tester) async {
+      final controller = _DatasetController(
+        BusinessDataset.fromRawJson(_factorySalesJson(validJson)),
+      );
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        ChangeNotifierProvider<AppController>.value(
+          value: controller,
+          child: MaterialApp(
+            home: Scaffold(body: const FactorySalesScreen()),
+          ),
+        ),
+      );
+
+      expect(find.text('وضعیت کارخانه'), findsOneWidget);
+      expect(find.text('وضعیت تریلی‌ها'), findsOneWidget);
+      expect(find.text('راننده تست'), findsOneWidget);
+    },
+  );
 
   test('داده اختیاری وضعیت فروشگاه‌ها HCH خوانده می‌شود', () {
     final dataset = BusinessDataset.fromRawJson(_storeStatusJson(validJson));
@@ -483,6 +558,35 @@ String _employeeSalaryJson(String source) =>
       "previousAccountEntries": [{"date": "1404/04/02", "amount": -150000}]
     }
   ],
+  "prices": [''');
+
+String _factorySalesJson(String source) =>
+    source.replaceFirst('"prices": [', '''"factorySales": {
+    "factories": [{"id": "FACTORY-1", "name": "کارخانه تست"}],
+    "entries": [
+      {
+        "id": "FS-1",
+        "opDate": "1404/05/01",
+        "operationType": "خروج تریلی کارتن",
+        "factoryId": "FACTORY-1",
+        "factoryName": "کارخانه تست",
+        "driverName": "راننده تست",
+        "driverNationalId": "",
+        "plateOrHelper": "12ب345",
+        "packageCount": "10",
+        "moisturePct": 12.5,
+        "grossWeightKg": 24000,
+        "netWeightKg": 21000,
+        "unitPrice": 1200000,
+        "cargoAmount": 25200000000,
+        "trailerRent": 5000000,
+        "prevBalance": 0,
+        "entryAmount": 0,
+        "exitAmount": 0,
+        "createdAt": "2025-07-23T00:00:00Z"
+      }
+    ]
+  },
   "prices": [''');
 
 String _storeStatusJson(String source) =>

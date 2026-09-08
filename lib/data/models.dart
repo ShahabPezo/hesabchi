@@ -931,6 +931,132 @@ class StoreStatus {
   }
 }
 
+class FactoryStatusFactory {
+  const FactoryStatusFactory({required this.id, required this.name});
+
+  final String id;
+  final String name;
+
+  factory FactoryStatusFactory.fromJson(Map<String, dynamic> json) {
+    const scope = 'کارخانه';
+    return FactoryStatusFactory(
+      id: _requiredText(json, 'id', scope: scope),
+      name: _requiredText(json, 'name', scope: scope),
+    );
+  }
+}
+
+class FactorySalesEntry {
+  const FactorySalesEntry({
+    required this.id,
+    required this.opDate,
+    required this.operationType,
+    required this.factoryId,
+    required this.factoryName,
+    required this.driverName,
+    required this.driverNationalId,
+    required this.plateOrHelper,
+    required this.packageCount,
+    required this.moisturePct,
+    required this.grossWeightKg,
+    required this.netWeightKg,
+    required this.unitPrice,
+    required this.cargoAmount,
+    required this.trailerRent,
+    required this.prevBalance,
+    required this.entryAmount,
+    required this.exitAmount,
+    required this.createdAt,
+  });
+
+  final String id;
+  // رشته‌ی شمسی خام «YYYY/MM/DD»؛ فیلتر بازه با مقایسه‌ی رشته‌ای (مثل ویندوز) انجام می‌شود.
+  final String opDate;
+  final String operationType;
+  final String factoryId;
+  final String factoryName;
+  final String driverName;
+  final String driverNationalId;
+  final String plateOrHelper;
+  final String packageCount;
+  final num? moisturePct;
+  final num grossWeightKg;
+  final num netWeightKg;
+  final int unitPrice;
+  final int cargoAmount;
+  final int trailerRent;
+  final int prevBalance;
+  final int entryAmount;
+  final int exitAmount;
+  final DateTime createdAt;
+
+  factory FactorySalesEntry.fromJson(Map<String, dynamic> json) {
+    const scope = 'فروش به کارخانه';
+    return FactorySalesEntry(
+      id: _requiredText(json, 'id', scope: scope),
+      opDate: _requiredJalaliDateText(json, 'opDate', scope: scope),
+      operationType: _requiredText(json, 'operationType', scope: scope),
+      factoryId: _optionalText(json['factoryId']),
+      factoryName: _optionalText(json['factoryName']),
+      driverName: _optionalText(json['driverName']),
+      driverNationalId: _optionalText(json['driverNationalId']),
+      plateOrHelper: _optionalText(json['plateOrHelper']),
+      packageCount: _optionalText(json['packageCount']),
+      moisturePct: _optionalNonNegativeNumber(
+        json['moisturePct'],
+        scope: scope,
+      ),
+      grossWeightKg: _requiredNonNegativeNumber(
+        json,
+        'grossWeightKg',
+        scope: scope,
+      ),
+      netWeightKg: _requiredNonNegativeNumber(
+        json,
+        'netWeightKg',
+        scope: scope,
+      ),
+      unitPrice: _requiredInteger(json, 'unitPrice', scope: scope),
+      cargoAmount: _requiredInteger(json, 'cargoAmount', scope: scope),
+      trailerRent: _optionalInteger(json['trailerRent'], scope: scope) ?? 0,
+      prevBalance: _optionalInteger(json['prevBalance'], scope: scope) ?? 0,
+      entryAmount: _optionalInteger(json['entryAmount'], scope: scope) ?? 0,
+      exitAmount: _optionalInteger(json['exitAmount'], scope: scope) ?? 0,
+      createdAt: _requiredDate(json, 'createdAt', scope: scope),
+    );
+  }
+}
+
+class FactorySales {
+  const FactorySales({required this.factories, required this.entries});
+
+  const FactorySales.empty() : factories = const [], entries = const [];
+
+  final List<FactoryStatusFactory> factories;
+  final List<FactorySalesEntry> entries;
+
+  factory FactorySales.fromJson(dynamic rawFactorySales) {
+    // فایل‌های HCH قدیمی‌تر (نسخه ۱) این فیلد را ندارند؛ نبود آن خطا نیست.
+    if (rawFactorySales == null) return const FactorySales.empty();
+    final json = _asMap(rawFactorySales, scope: 'فروش به کارخانه‌ها');
+    final factories =
+        _optionalList(json['factories'], scope: 'فروش به کارخانه‌ها')
+            .map(
+              (item) => FactoryStatusFactory.fromJson(
+                _asMap(item, scope: 'کارخانه'),
+              ),
+            )
+            .toList(growable: false);
+    final entries = _optionalList(json['entries'], scope: 'فروش به کارخانه‌ها')
+        .map(
+          (item) =>
+              FactorySalesEntry.fromJson(_asMap(item, scope: 'فروش به کارخانه')),
+        )
+        .toList(growable: false);
+    return FactorySales(factories: factories, entries: entries);
+  }
+}
+
 class BusinessDataset {
   const BusinessDataset({
     required this.version,
@@ -943,10 +1069,15 @@ class BusinessDataset {
     required this.invoices,
     required this.prices,
     required this.storeStatus,
+    required this.factorySales,
     required this.rawJson,
   });
 
   static const supportedVersion = 1;
+  // بالاترین نسخه‌ای که این نسخه‌ی اندروید می‌شناسد؛ نسخه‌های بین این دو مقدار پشتیبانی می‌شوند
+  // (فیلدهای هر نسخه‌ی جدید همیشه اختیاری و nullable-safe هستند، پس نسخه‌ی پایین‌تر هم بی‌خطر
+  // پردازش می‌شود).
+  static const maxKnownVersion = 2;
 
   final int version;
   final DateTime exportedAt;
@@ -958,6 +1089,7 @@ class BusinessDataset {
   final List<Invoice> invoices;
   final List<PriceItem> prices;
   final StoreStatus storeStatus;
+  final FactorySales factorySales;
   final String rawJson;
 
   int get totalReceivable =>
@@ -972,9 +1104,10 @@ class BusinessDataset {
     }
     final json = _asMap(decoded, scope: 'ریشه فایل');
     final version = _requiredInteger(json, 'version', scope: 'ریشه فایل');
-    if (version != supportedVersion) {
+    if (version < supportedVersion || version > maxKnownVersion) {
       throw ImportValidationException(
-        'نسخه فایل ($version) پشتیبانی نمی‌شود. نسخه مورد انتظار $supportedVersion است.',
+        'نسخه فایل ($version) پشتیبانی نمی‌شود. نسخه‌های مورد انتظار بین '
+        '$supportedVersion تا $maxKnownVersion هستند.',
       );
     }
     final customers = _requiredList(json, 'customers', scope: 'ریشه فایل')
@@ -1039,6 +1172,7 @@ class BusinessDataset {
       invoices: invoices,
       prices: prices,
       storeStatus: StoreStatus.fromJson(json['storeStatus']),
+      factorySales: FactorySales.fromJson(json['factorySales']),
       rawJson: source,
     );
   }
