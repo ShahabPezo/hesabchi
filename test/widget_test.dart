@@ -375,7 +375,17 @@ void main() {
       );
 
       expect(find.text('وضعیت کارخانه'), findsOneWidget);
+      await tester.dragUntilVisible(
+        find.text('وضعیت تریلی‌ها'),
+        find.byType(Scrollable).first,
+        const Offset(0, -300),
+      );
       expect(find.text('وضعیت تریلی‌ها'), findsOneWidget);
+      await tester.dragUntilVisible(
+        find.text('راننده تست'),
+        find.byType(Scrollable).first,
+        const Offset(0, -300),
+      );
       expect(find.text('راننده تست'), findsOneWidget);
     },
   );
