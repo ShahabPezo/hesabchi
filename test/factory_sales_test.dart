@@ -65,7 +65,8 @@ void main() {
       final result = FactoryStatusResult.compute(rows);
 
       expect(result.initialPrice, 100);
-      expect(result.finalPrice, 110);
+      // (جمع مبلغ بار - جمع کرایه تریلی) / جمع وزن خالص = (1000 - 100) / 10
+      expect(result.finalPrice, 90);
     });
 
     test('وزن خالص صفر باعث تقسیم‌بر‌صفر نمی‌شود', () {
@@ -138,6 +139,22 @@ void main() {
       final result = FactoryStatusResult.compute(rows);
 
       expect(result.totalDeposits, 500);
+    });
+
+    test('درصد کسر از بار به‌درستی محاسبه می‌شود', () {
+      final rows = [_entry(grossWeightKg: 100, netWeightKg: 92)];
+
+      final result = FactoryStatusResult.compute(rows);
+
+      expect(result.moistureLossPct, 8.0);
+    });
+
+    test('وزن ناخالص صفر باعث خطای تقسیم‌بر‌صفر در درصد کسر نمی‌شود', () {
+      final rows = [_entry(grossWeightKg: 0, netWeightKg: 0)];
+
+      final result = FactoryStatusResult.compute(rows);
+
+      expect(result.moistureLossPct, 0);
     });
   });
 

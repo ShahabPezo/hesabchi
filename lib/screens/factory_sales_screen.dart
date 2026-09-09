@@ -13,6 +13,17 @@ import '../widgets/ui_components.dart';
 const String _allFactoriesOption = 'همه کارخانه‌ها';
 const String _allDriversOption = 'همه راننده‌ها';
 
+List<String> _driverNamesFor(FactorySales factorySales, String factory) {
+  final names = <String>{
+    for (final entry in factorySales.entries)
+      if (entry.driverName.trim().isNotEmpty &&
+          (factory == _allFactoriesOption || entry.factoryName == factory))
+        entry.driverName,
+  }.toList();
+  names.sort();
+  return names;
+}
+
 class FactorySalesScreen extends StatefulWidget {
   const FactorySalesScreen({super.key});
 
@@ -43,17 +54,7 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
         (name) => name.trim().isEmpty,
       ),
     ]..sort();
-    final driverNamesForFactory =
-        [
-            ...{
-              for (final entry in factorySales.entries)
-                if (entry.driverName.trim().isNotEmpty &&
-                    (_factory == _allFactoriesOption ||
-                        entry.factoryName == _factory))
-                  entry.driverName,
-            },
-          ]
-          ..sort();
+    final driverNamesForFactory = _driverNamesFor(factorySales, _factory);
 
     final startText = _padDate(_start);
     final endText = _padDate(_end);
@@ -118,9 +119,14 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
                       )
                       .toList(growable: false),
                   onChanged: (value) => setState(() {
-                    _factory = value ?? _allFactoriesOption;
+                    final newFactory = value ?? _allFactoriesOption;
+                    _factory = newFactory;
+                    final allowedDrivers = _driverNamesFor(
+                      factorySales,
+                      newFactory,
+                    );
                     if (_driver != _allDriversOption &&
-                        !driverNamesForFactory.contains(_driver)) {
+                        !allowedDrivers.contains(_driver)) {
                       _driver = _allDriversOption;
                     }
                   }),
@@ -173,6 +179,10 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
           rows: [
             _KeyValueRow('جمع وزن ناخالص', formatWeight(factoryStatus.totalGross)),
             _KeyValueRow('جمع وزن خالص', formatWeight(factoryStatus.totalNet)),
+            _KeyValueRow(
+              'درصد کسر از بار',
+              '${toPersianDigits(factoryStatus.moistureLossPct.toStringAsFixed(1))}٪',
+            ),
             _KeyValueRow('جمع مبلغ بار', formatMoney(factoryStatus.totalCargo)),
             _KeyValueRow(
               'جمع کرایه تریلی‌ها',
@@ -247,7 +257,7 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
               child: Card(
                 child: ListTile(
                   onTap: () =>
-                      _showDriverInvoicesSheet(context, driverName, entries),
+                      _openDriverInvoicesScreen(context, driverName, entries),
                   title: Text(
                     driverName,
                     style: Theme.of(context).textTheme.titleMedium,
@@ -291,18 +301,15 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
     return Colors.black87;
   }
 
-  void _showDriverInvoicesSheet(
+  void _openDriverInvoicesScreen(
     BuildContext context,
     String driverName,
     List<FactorySalesEntry> entries,
   ) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (context) => _DriverInvoicesSheet(
-        driverName: driverName,
-        entries: entries,
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            _DriverInvoicesScreen(driverName: driverName, entries: entries),
       ),
     );
   }
@@ -371,8 +378,8 @@ class _KeyValueCard extends StatelessWidget {
   }
 }
 
-class _DriverInvoicesSheet extends StatelessWidget {
-  const _DriverInvoicesSheet({
+class _DriverInvoicesScreen extends StatelessWidget {
+  const _DriverInvoicesScreen({
     required this.driverName,
     required this.entries,
   });
@@ -382,32 +389,87 @@ class _DriverInvoicesSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(driverName, style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 4),
-            Text(
-              '${formatNumber(entries.length)} فاکتور',
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: AppColors.mutedText),
-            ),
-            const SizedBox(height: 12),
-            Flexible(
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: entries.length,
-                separatorBuilder: (_, _) => const Divider(height: 24),
-                itemBuilder: (context, index) =>
-                    _DriverInvoiceDetail(entry: entries[index]),
+    final sortedEntries = [...entries]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final factoryNames = {
+      for (final entry in entries)
+        if (entry.factoryName.trim().isNotEmpty) entry.factoryName,
+    }.toList();
+    final factoryLabel = factoryNames.isEmpty
+        ? 'نامشخص'
+        : factoryNames.join('، ');
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('جزئیات فاکتورها')),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'کارخانه: $factoryLabel',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'راننده/کارفرما: $driverName',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${formatNumber(sortedEntries.length)} فاکتور',
+                      style: Theme.of(context).textTheme.bodySmall
+                          ?.copyWith(color: AppColors.mutedText),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
+          ),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              itemCount: sortedEntries.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final entry = sortedEntries[index];
+                return Card(
+                  child: ListTile(
+                    onTap: () => _showInvoiceDetailSheet(context, entry),
+                    title: Text(
+                      toPersianDigits(entry.opDate),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    subtitle: Text('شماره فاکتور: ${entry.id}'),
+                    trailing: const Icon(Icons.chevron_left),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showInvoiceDetailSheet(BuildContext context, FactorySalesEntry entry) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+          child: SingleChildScrollView(
+            child: _DriverInvoiceDetail(entry: entry),
+          ),
         ),
       ),
     );

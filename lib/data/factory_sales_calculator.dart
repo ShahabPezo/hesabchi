@@ -9,6 +9,7 @@ class FactoryStatusResult {
     required this.totalGross,
     required this.totalNet,
     required this.totalCargo,
+    required this.moistureLossPct,
     required this.initialPrice,
     required this.finalPrice,
     required this.totalDeposits,
@@ -20,6 +21,7 @@ class FactoryStatusResult {
   final num totalGross;
   final num totalNet;
   final int totalCargo;
+  final double moistureLossPct;
   final double initialPrice;
   final double finalPrice;
   final int totalDeposits;
@@ -38,10 +40,13 @@ class FactoryStatusResult {
       totalCargo += row.cargoAmount;
       totalRent += row.trailerRent;
     }
+    final moistureLossPct = totalGross == 0
+        ? 0.0
+        : (totalGross - totalNet) / totalGross * 100;
     final initialPrice = totalNet == 0 ? 0.0 : totalCargo / totalNet;
     final finalPrice = totalNet == 0
         ? 0.0
-        : (totalCargo + totalRent) / totalNet;
+        : (totalCargo - totalRent) / totalNet;
 
     final trailerDriverNames = <String>{
       for (final row in rows)
@@ -73,6 +78,7 @@ class FactoryStatusResult {
       totalGross: totalGross,
       totalNet: totalNet,
       totalCargo: totalCargo,
+      moistureLossPct: moistureLossPct,
       initialPrice: initialPrice,
       finalPrice: finalPrice,
       totalDeposits: totalDeposits,

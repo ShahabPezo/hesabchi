@@ -390,6 +390,40 @@ void main() {
     },
   );
 
+  testWidgets(
+    'لمس ردیف راننده در فروش به کارخانه‌ها به صفحه جزئیات فاکتورها می‌رود',
+    (tester) async {
+      final controller = _DatasetController(
+        BusinessDataset.fromRawJson(_factorySalesJson(validJson)),
+      );
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        ChangeNotifierProvider<AppController>.value(
+          value: controller,
+          child: MaterialApp(
+            home: Scaffold(body: const FactorySalesScreen()),
+          ),
+        ),
+      );
+
+      await tester.dragUntilVisible(
+        find.text('راننده تست'),
+        find.byType(Scrollable).first,
+        const Offset(0, -300),
+      );
+      await tester.tap(find.text('راننده تست'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('جزئیات فاکتورها'), findsOneWidget);
+      expect(find.textContaining('کارخانه تست'), findsOneWidget);
+
+      await tester.tap(find.text('شماره فاکتور: FS-1'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('نوع عملیات'), findsOneWidget);
+    },
+  );
+
   test('داده اختیاری وضعیت فروشگاه‌ها HCH خوانده می‌شود', () {
     final dataset = BusinessDataset.fromRawJson(_storeStatusJson(validJson));
 
