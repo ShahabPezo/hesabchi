@@ -213,7 +213,7 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
               formatMoney(factoryStatus.currentBalance),
               emphasized: true,
               color: _balanceColor(factoryStatus.currentBalance),
-              label: factoryStatus.currentBalance > 0
+              label2: factoryStatus.currentBalance > 0
                   ? 'بدهی به کارخانه'
                   : factoryStatus.currentBalance < 0
                       ? 'طلب از کارخانه'
@@ -241,7 +241,7 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
               formatMoney(trailerStatus.balance),
               emphasized: true,
               color: _balanceColor(trailerStatus.balance),
-              label: trailerStatus.balance > 0
+              label2: trailerStatus.balance > 0
                   ? 'بدهی به راننده‌ها'
                   : trailerStatus.balance < 0
                       ? 'طلب از راننده‌ها'
