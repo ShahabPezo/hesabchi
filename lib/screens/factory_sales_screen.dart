@@ -389,7 +389,7 @@ class _KeyValueCard extends StatelessWidget {
                                   ),
                                   decoration: BoxDecoration(
                                     color: (rows[i].color ?? Colors.black87)
-                                        .withOpacity(0.12),
+                                        .withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
