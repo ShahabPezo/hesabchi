@@ -78,12 +78,12 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
       endText: endText,
     );
     final invoiceEligible = rows.where((entry) => entry.trailerRent > 0).toList();
-    final driverGroups = <String, List<FactorySalesEntry>>{};
+    final factoryGroups = <String, List<FactorySalesEntry>>{};
     for (final entry in invoiceEligible) {
-      if (entry.driverName.trim().isEmpty) continue;
-      driverGroups.putIfAbsent(entry.driverName, () => []).add(entry);
+      final key = entry.factoryName.trim().isEmpty ? 'نامشخص' : entry.factoryName;
+      factoryGroups.putIfAbsent(key, () => []).add(entry);
     }
-    final driverGroupNames = driverGroups.keys.toList()..sort();
+    final factoryGroupNames = factoryGroups.keys.toList()..sort();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
@@ -213,6 +213,11 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
               formatMoney(factoryStatus.currentBalance),
               emphasized: true,
               color: _balanceColor(factoryStatus.currentBalance),
+              label: factoryStatus.currentBalance > 0
+                  ? 'بدهی به کارخانه'
+                  : factoryStatus.currentBalance < 0
+                      ? 'طلب از کارخانه'
+                      : 'تسویه',
             ),
           ],
         ),
@@ -236,30 +241,35 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
               formatMoney(trailerStatus.balance),
               emphasized: true,
               color: _balanceColor(trailerStatus.balance),
+              label: trailerStatus.balance > 0
+                  ? 'بدهی به راننده‌ها'
+                  : trailerStatus.balance < 0
+                      ? 'طلب از راننده‌ها'
+                      : 'تسویه',
             ),
           ],
         ),
         const SizedBox(height: 24),
         SectionHeader(
-          title: 'لیست فاکتورها (${formatNumber(driverGroupNames.length)})',
+          title: 'لیست فاکتورها (${formatNumber(factoryGroupNames.length)})',
         ),
         const SizedBox(height: 10),
-        if (driverGroupNames.isEmpty)
+        if (factoryGroupNames.isEmpty)
           const EmptyListNotice(
             text: 'فاکتوری با کرایه‌ی تریلی برای این انتخاب ثبت نشده است.',
           )
         else
-          ...driverGroupNames.map((driverName) {
-            final entries = driverGroups[driverName]!
+          ...factoryGroupNames.map((factoryName) {
+            final entries = factoryGroups[factoryName]!
               ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Card(
                 child: ListTile(
                   onTap: () =>
-                      _openDriverInvoicesScreen(context, driverName, entries),
+                      _openDriverInvoicesScreen(context, factoryName, entries),
                   title: Text(
-                    driverName,
+                    factoryName,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   subtitle: Text('${formatNumber(entries.length)} فاکتور'),
@@ -322,12 +332,15 @@ class _KeyValueRow {
     this.value, {
     this.emphasized = false,
     this.color,
+    this.label2,
   });
 
   final String label;
   final String value;
   final bool emphasized;
   final Color? color;
+  /// لیبل وضعیت زیر مقدار (مثلاً بدهی / طلب / تسویه)
+  final String? label2;
 }
 
 class _KeyValueCard extends StatelessWidget {
@@ -355,14 +368,40 @@ class _KeyValueCard extends StatelessWidget {
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         Flexible(
-                          child: Text(
-                            rows[i].value,
-                            textAlign: TextAlign.end,
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: rows[i].color,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                rows[i].value,
+                                textAlign: TextAlign.end,
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: rows[i].color,
+                                    ),
+                              ),
+                              if (rows[i].label2 != null)
+                                Container(
+                                  margin: const EdgeInsets.only(top: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: (rows[i].color ?? Colors.black87)
+                                        .withOpacity(0.12),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    rows[i].label2!,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: rows[i].color ?? Colors.black87,
+                                    ),
+                                  ),
                                 ),
+                            ],
                           ),
                         ),
                       ],
@@ -424,8 +463,11 @@ class _DriverInvoicesScreen extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       '${formatNumber(sortedEntries.length)} فاکتور',
-                      style: Theme.of(context).textTheme.bodySmall
-                          ?.copyWith(color: AppColors.mutedText),
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
                     ),
                   ],
                 ),
