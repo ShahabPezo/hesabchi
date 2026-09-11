@@ -38,6 +38,5 @@ Analyzing hesabchi...
   error • The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label' • lib/screens/factory_sales_screen.dart:216:15 • undefined_named_parameter
   error • The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label' • lib/screens/factory_sales_screen.dart:244:15 • undefined_named_parameter
 warning • A value for optional parameter 'label2' isn't ever given. Try removing the unused parameter • lib/screens/factory_sales_screen.dart:335:10 • unused_element_parameter
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement • lib/screens/factory_sales_screen.dart:392:42 • deprecated_member_use
 
-4 issues found. (ran in 9.6s)
+3 issues found. (ran in 10.1s)
