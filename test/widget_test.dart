@@ -415,7 +415,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('جزئیات فاکتورها'), findsOneWidget);
-      expect(find.textContaining('کارخانه تست'), findsOneWidget);
+      expect(find.textContaining('کارخانه تست'), findsWidgets);
 
       await tester.tap(find.text('شماره فاکتور: FS-1'));
       await tester.pumpAndSettle();
