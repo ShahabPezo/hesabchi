@@ -22,6 +22,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Get version from pubspec
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//' | tr -d '[:space:]')
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Format check
         run: dart format --output=none --set-exit-if-changed lib test || true
 
@@ -68,11 +74,14 @@ jobs:
           flutter build apk --debug \
             --dart-define=HESABCHI_GITHUB_READER_TOKEN="$HESABCHI_GITHUB_READER_TOKEN"
 
+      - name: Rename APK with version
+        run: |
+          cp build/app/outputs/flutter-apk/app-debug.apk \
+             build/app/outputs/flutter-apk/hesabchi-v${{ steps.version.outputs.VERSION }}-debug.apk
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: hesabchi-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: hesabchi-v${{ steps.version.outputs.VERSION }}
+          path: build/app/outputs/flutter-apk/hesabchi-v${{ steps.version.outputs.VERSION }}-debug.apk
           retention-days: 30
-
-

@@ -213,10 +213,10 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
               formatMoney(factoryStatus.currentBalance),
               emphasized: true,
               color: _balanceColor(factoryStatus.currentBalance),
-              label2: factoryStatus.currentBalance > 0
-                  ? 'بدهی به کارخانه'
-                  : factoryStatus.currentBalance < 0
-                      ? 'طلب از کارخانه'
+              label2: factoryStatus.currentBalance < 0
+                  ? 'طلب از کارخانه'
+                  : factoryStatus.currentBalance > 0
+                      ? 'بدهی به کارخانه'
                       : 'تسویه',
             ),
           ],
@@ -535,10 +535,11 @@ class _DriverInvoiceDetail extends StatelessWidget {
       if (entry.packageCount.isNotEmpty)
         _KeyValueRow('تعداد بسته', toPersianDigits(entry.packageCount)),
       _KeyValueRow('قیمت واحد', formatMoney(entry.unitPrice)),
+      _KeyValueRow('مبلغ کل قبل از کرایه', formatMoney(entry.cargoAmount)),
       _KeyValueRow('کرایه', formatMoney(entry.trailerRent)),
       _KeyValueRow(
         'مبلغ کل بعد از کرایه',
-        formatMoney(entry.cargoAmount + entry.trailerRent),
+        formatMoney(entry.cargoAmount - entry.trailerRent),
         emphasized: true,
       ),
     ];

@@ -72,7 +72,7 @@ class FactoryStatusResult {
       totalPrev += row.prevBalance;
     }
 
-    final currentBalance = totalCargo - totalDeposits + totalPaid + totalPrev;
+    final currentBalance = totalCargo + totalDeposits - totalPaid + totalPrev;
 
     return FactoryStatusResult(
       totalGross: totalGross,
