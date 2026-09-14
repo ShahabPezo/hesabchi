@@ -58,26 +58,37 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
 
     final startText = _padDate(_start);
     final endText = _padDate(_end);
-    final rows = factorySales.entries.where((entry) {
+
+    // ردیف‌های کارخانه — فقط بر اساس نام کارخانه و بازه تاریخ
+    final factoryRows = factorySales.entries.where((entry) {
       final matchesFactory =
           _factory == _allFactoriesOption || entry.factoryName == _factory;
+      final matchesStart = startText == null || entry.opDate.compareTo(startText) >= 0;
+      final matchesEnd = endText == null || entry.opDate.compareTo(endText) <= 0;
+      return matchesFactory && matchesStart && matchesEnd;
+    }).toList();
+
+    // ردیف‌های تریلی — بر اساس نام راننده و بازه تاریخ
+    final trailerRows = factorySales.entries.where((entry) {
       final matchesDriver =
           _driver == _allDriversOption || entry.driverName == _driver;
       final matchesStart = startText == null || entry.opDate.compareTo(startText) >= 0;
       final matchesEnd = endText == null || entry.opDate.compareTo(endText) <= 0;
-      return matchesFactory && matchesDriver && matchesStart && matchesEnd;
+      return matchesDriver && matchesStart && matchesEnd;
     }).toList();
 
-    final factoryStatus = FactoryStatusResult.compute(rows);
+    final factoryStatus = FactoryStatusResult.compute(factoryRows);
     final trailerStatus = TrailerStatusResult.compute(
-      rows: rows,
+      rows: trailerRows,
       allEntries: factorySales.entries,
       driverFilter: _driver,
       allDriversOption: _allDriversOption,
       startText: startText,
       endText: endText,
     );
-    final invoiceEligible = rows.where((entry) => entry.trailerRent > 0).toList();
+
+    // لیست فاکتورها بر اساس کارخانه گروه‌بندی می‌شه
+    final invoiceEligible = factoryRows.where((entry) => entry.trailerRent > 0).toList();
     final factoryGroups = <String, List<FactorySalesEntry>>{};
     for (final entry in invoiceEligible) {
       final key = entry.factoryName.trim().isEmpty ? 'نامشخص' : entry.factoryName;

@@ -37,7 +37,8 @@ class FactoryStatusResult {
     for (final row in rows) {
       totalGross += row.grossWeightKg;
       totalNet += row.netWeightKg;
-      totalCargo += row.cargoAmount;
+      // مبلغ بار در فاکتور منفی ثبت می‌شه، قدرمطلق می‌گیریم
+      totalCargo += row.cargoAmount.abs();
       totalRent += row.trailerRent;
     }
     final moistureLossPct = totalGross == 0
@@ -72,7 +73,7 @@ class FactoryStatusResult {
       totalPrev += row.prevBalance;
     }
 
-    final currentBalance = totalCargo + totalDeposits - totalPaid + totalPrev;
+    final currentBalance = totalCargo - totalDeposits + totalPaid + totalPrev;
 
     return FactoryStatusResult(
       totalGross: totalGross,
