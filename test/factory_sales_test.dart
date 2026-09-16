@@ -65,8 +65,8 @@ void main() {
       final result = FactoryStatusResult.compute(rows);
 
       expect(result.initialPrice, 100);
-      // (جمع مبلغ بار - جمع کرایه تریلی) / جمع وزن خالص = (1000 - 100) / 10
-      expect(result.finalPrice, 90);
+      // (جمع مبلغ بار + جمع کرایه تریلی) / جمع وزن خالص = (1000 + 100) / 10
+      expect(result.finalPrice, 110);
     });
 
     test('وزن خالص صفر باعث تقسیم‌بر‌صفر نمی‌شود', () {
