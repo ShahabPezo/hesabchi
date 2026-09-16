@@ -33,73 +33,8 @@ Downloading packages...
 Got dependencies!
 30 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
+Analyzing hesabchi...                                           
 
-::group::✅ Passing tests
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: داده نسخه یک معتبر تحلیل و نگهداری می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: بازه فاکتورها از کلید scope فایل HCH خوانده می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تب خانه با فایل قدیمی بدون scope رندر می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تب خانه با فایل بازه‌دار بدون توقف رندر می‌کند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: داده وضعیت ماهانه HCH خوانده و بر اساس ماه مرتب می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تب آمار برای فایل HCH قدیمی حالت خالی سازگار نشان می‌دهد
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تب آمار جدیدترین ماه و مشتری برتر را رندر می‌کند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: آمار و گزینه‌های منوی بیشتر در دسترس‌اند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: داده اختیاری حقوق افراد HCH خوانده می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: فیلدهای اختیاری hireDate/terminationDate کارمند خوانده می‌شوند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تاریخ پایان بازه بعد از پایان همکاری محدود می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تاریخ شروع بازه قبل از شروع همکاری محدود می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: بازه‌ی داخل محدوده‌ی همکاری بدون تغییر باقی می‌ماند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نبود hireDate/terminationDate هیچ محدودیتی اعمال نمی‌کند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: صفحه حقوق افراد برای HCH قدیمی بدون داده کرش نمی‌کند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: تنظیمات با داده پاک‌شده رندر خطرناک ندارد
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نسخه پشتیبانی‌نشده با خطای قابل فهم رد می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نسخه ۲ فایل بدون خطا پردازش می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: داده اختیاری فروش به کارخانه‌ها HCH خوانده می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نبود فروش به کارخانه‌ها در HCH قدیمی خطا ایجاد نمی‌کند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: صفحه فروش به کارخانه‌ها برای HCH قدیمی بدون داده کرش نمی‌کند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: صفحه فروش به کارخانه‌ها وضعیت کارخانه و تریلی‌ها را نشان می‌دهد
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: لمس ردیف راننده در فروش به کارخانه‌ها به صفحه جزئیات فاکتورها می‌رود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: داده اختیاری وضعیت فروشگاه‌ها HCH خوانده می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نبود وضعیت فروشگاه‌ها در HCH قدیمی خطا ایجاد نمی‌کند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: صفحه وضعیت فروشگاه‌ها برای HCH قدیمی بدون داده کرش نمی‌کند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: صفحه وضعیت فروشگاه‌ها فاکتور ورود کارتن را نشان می‌دهد
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: گروگذاری فاکتور برای هر مشتری در دفترچه مشتریان محاسبه می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: فیلد اختیاری grossWeight آیتم فاکتور خوانده می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نبود grossWeight در فایل قدیمی خطا ایجاد نمی‌کند
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: فیلد اختیاری phones مشتری خوانده می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: نبود phones در فایل قدیمی از phone تکی ساخته می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: دفترچه مشتریان مشتری بدون فاکتور را هم نشان می‌دهد
-✅ /home/runner/work/hesabchi/hesabchi/test/widget_test.dart: فاکتور با مشتری ناشناخته رد می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: فرمول حقوق و تسویه بازه جلالی عین داده راهنما محاسبه می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: رکورد یک روز پیش از ابتدای بازه برای حقوق و تسویه معتبر است
-✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: مانده صفرِ فاقد تاریخ تسویه از HCH قدیمی معتبر می‌ماند
-✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: دوره متنی واریزی HCH قدیمی ویندوز به عدد canonical تبدیل می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/employee_salary_test.dart: تا انتخاب کامل کارمند و بازه، محاسبه صفر باقی می‌ماند
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: FactoryStatusResult جمع وزن‌ها و مبلغ‌ها به‌درستی محاسبه می‌شود
-::endgroup::
-::group::❌ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: FactoryStatusResult فی میانگین اولیه و نهایی درست حساب می‌شود (failed)
-Expected: <90>
-  Actual: <110.0>
+  error • The getter 'totalRent' isn't defined for the type 'FactoryStatusResult'. Try importing the library that defines 'totalRent', correcting the name to the name of an existing getter, or defining a getter or field named 'totalRent' • lib/screens/factory_sales_screen.dart:220:41 • undefined_getter
 
-package:matcher                                     expect
-package:flutter_test/src/widget_tester.dart 473:18  expect
-test/factory_sales_test.dart 69:7                   main.<fn>.<fn>
-::endgroup::
-::group::✅ Passing tests
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: FactoryStatusResult وزن خالص صفر باعث تقسیم‌بر‌صفر نمی‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: FactoryStatusResult ردیف کرایه راننده تریلی از حساب کارخانه کنار گذاشته می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: FactoryStatusResult حساب قبلی راننده‌ی تریلی از حساب کارخانه کنار گذاشته می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: FactoryStatusResult حساب قبلیِ غیرمرتبط با راننده‌ی تریلی در حساب کارخانه می‌ماند
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: FactoryStatusResult واریزی کارخانه با قدرمطلق جمع می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: FactoryStatusResult درصد کسر از بار به‌درستی محاسبه می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: FactoryStatusResult وزن ناخالص صفر باعث خطای تقسیم‌بر‌صفر در درصد کسر نمی‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: TrailerStatusResult تعداد تریلی همه‌ی سفرهای خروج را می‌شمارد حتی بدون کرایه
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: TrailerStatusResult پرداختی و حساب قبلی راننده از کل entries محاسبه می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/factory_sales_test.dart: TrailerStatusResult بازه‌ی تاریخ روی پرداختی/حساب قبلی راننده هم اعمال می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: متادیتا و HCH جدید GitHub دریافت و اعتبارسنجی اندازه می‌شوند
-✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: اگر خروجی GitHub جدیدتر نباشد، HCH کامل دریافت نمی‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: خطای شبکه GitHub به خطای کنترل‌شده تبدیل می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: HCH جدید فقط پس از اعتبارسنجی کامل جایگزین snapshot قبلی می‌شود
-✅ /home/runner/work/hesabchi/hesabchi/test/github_sync_test.dart: HCH نامعتبر دریافت‌شده، snapshot قبلی گوشی را تغییر نمی‌دهد
-::endgroup::
-
-::error::55 tests passed, 1 failed.
+1 issue found. (ran in 6.7s)
