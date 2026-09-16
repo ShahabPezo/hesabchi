@@ -9,6 +9,7 @@ class FactoryStatusResult {
     required this.totalGross,
     required this.totalNet,
     required this.totalCargo,
+    required this.totalRent,
     required this.moistureLossPct,
     required this.initialPrice,
     required this.finalPrice,
@@ -21,6 +22,7 @@ class FactoryStatusResult {
   final num totalGross;
   final num totalNet;
   final int totalCargo;
+  final int totalRent;
   final double moistureLossPct;
   final double initialPrice;
   final double finalPrice;
@@ -45,9 +47,11 @@ class FactoryStatusResult {
         ? 0.0
         : (totalGross - totalNet) / totalGross * 100;
     final initialPrice = totalNet == 0 ? 0.0 : totalCargo / totalNet;
+    // مطابق ویندوز: کرایه هزینه‌ی ماست و برای رسیدن به «فی نهایی بعد از کرایه»
+    // به مبلغ بار اضافه می‌شود.
     final finalPrice = totalNet == 0
         ? 0.0
-        : (totalCargo - totalRent) / totalNet;
+        : (totalCargo + totalRent) / totalNet;
 
     final trailerDriverNames = <String>{
       for (final row in rows)
@@ -79,6 +83,7 @@ class FactoryStatusResult {
       totalGross: totalGross,
       totalNet: totalNet,
       totalCargo: totalCargo,
+      totalRent: totalRent,
       moistureLossPct: moistureLossPct,
       initialPrice: initialPrice,
       finalPrice: finalPrice,

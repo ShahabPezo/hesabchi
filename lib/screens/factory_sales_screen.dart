@@ -59,13 +59,29 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
     final startText = _padDate(_start);
     final endText = _padDate(_end);
 
-    // ردیف‌های کارخانه — فقط بر اساس نام کارخانه و بازه تاریخ
+    // همان منطق ویندوز:
+    // - وقتی «همه کارخانه‌ها» انتخاب شده، فقط عملیات‌های پایه‌ی تب فروش به کارخانه
+    //   وارد محاسبات می‌شوند.
+    // - وقتی یک کارخانه‌ی مشخص انتخاب شده، هر عملیاتی که نام همان کارخانه را دارد
+    //   (از جمله «حساب قبلی») نیز در نظر گرفته می‌شود.
+    const baseFactoryOperations = {
+      trailerExitOperation,
+      trailerRentOperation,
+      'فروش کارتن پرس شده',
+    };
     final factoryRows = factorySales.entries.where((entry) {
       final matchesFactory =
           _factory == _allFactoriesOption || entry.factoryName == _factory;
+      if (!matchesFactory) return false;
+
+      if (_factory == _allFactoriesOption &&
+          !baseFactoryOperations.contains(entry.operationType)) {
+        return false;
+      }
+
       final matchesStart = startText == null || entry.opDate.compareTo(startText) >= 0;
       final matchesEnd = endText == null || entry.opDate.compareTo(endText) <= 0;
-      return matchesFactory && matchesStart && matchesEnd;
+      return matchesStart && matchesEnd;
     }).toList();
 
     // ردیف‌های تریلی — بر اساس نام راننده و بازه تاریخ
@@ -88,7 +104,11 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
     );
 
     // لیست فاکتورها بر اساس کارخانه گروه‌بندی می‌شه
-    final invoiceEligible = factoryRows.where((entry) => entry.trailerRent > 0).toList();
+    // هر «خروج تریلی کارتن» یک فاکتور/سفر کارخانه است؛ حتی اگر کرایه به عهده‌ی کارخانه
+    // باشد و trailerRent آن صفر باشد. این مورد در ویندوز نیز در تعداد سفرها وجود دارد.
+    final invoiceEligible = factoryRows
+        .where((entry) => entry.operationType == trailerExitOperation)
+        .toList();
     final factoryGroups = <String, List<FactorySalesEntry>>{};
     for (final entry in invoiceEligible) {
       final key = entry.factoryName.trim().isEmpty ? 'نامشخص' : entry.factoryName;
@@ -197,7 +217,7 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
             _KeyValueRow('جمع مبلغ بار', formatMoney(factoryStatus.totalCargo)),
             _KeyValueRow(
               'جمع کرایه تریلی‌ها',
-              formatMoney(trailerStatus.balance),
+              formatMoney(factoryStatus.totalRent),
             ),
             _KeyValueRow(
               'فی میانگین اولیه',
@@ -223,10 +243,14 @@ class _FactorySalesScreenState extends State<FactorySalesScreen> {
               'حساب جاری کارخانه',
               formatMoney(factoryStatus.currentBalance),
               emphasized: true,
-              color: _balanceColor(factoryStatus.currentBalance),
-              label2: factoryStatus.currentBalance < 0
+              color: factoryStatus.currentBalance > 0
+                  ? AppColors.success
+                  : factoryStatus.currentBalance < 0
+                      ? AppColors.danger
+                      : Colors.black87,
+              label2: factoryStatus.currentBalance > 0
                   ? 'طلب از کارخانه'
-                  : factoryStatus.currentBalance > 0
+                  : factoryStatus.currentBalance < 0
                       ? 'بدهی به کارخانه'
                       : 'تسویه',
             ),
