@@ -293,7 +293,7 @@ void main() {
   });
 
   test('نسخه پشتیبانی‌نشده با خطای قابل فهم رد می‌شود', () {
-    final unsupported = validJson.replaceFirst('"version": 1', '"version": 3');
+    final unsupported = validJson.replaceFirst('"version": 1', '"version": 4');
 
     expect(
       () => BusinessDataset.fromRawJson(unsupported),
@@ -382,11 +382,11 @@ void main() {
       );
       expect(find.text('وضعیت تریلی‌ها'), findsOneWidget);
       await tester.dragUntilVisible(
-        find.text('کارخانه تست'),
+        find.text('راننده تست'),
         find.byType(Scrollable).first,
         const Offset(0, -300),
       );
-      expect(find.text('کارخانه تست'), findsOneWidget);
+      expect(find.text('راننده تست'), findsOneWidget);
     },
   );
 
@@ -407,15 +407,15 @@ void main() {
       );
 
       await tester.dragUntilVisible(
-        find.text('کارخانه تست'),
+        find.text('راننده تست'),
         find.byType(Scrollable).first,
         const Offset(0, -300),
       );
-      await tester.tap(find.text('کارخانه تست'));
+      await tester.tap(find.text('راننده تست'));
       await tester.pumpAndSettle();
 
       expect(find.text('جزئیات فاکتورها'), findsOneWidget);
-      expect(find.textContaining('کارخانه تست'), findsWidgets);
+      expect(find.textContaining('کارخانه تست'), findsOneWidget);
 
       await tester.tap(find.text('شماره فاکتور: FS-1'));
       await tester.pumpAndSettle();
