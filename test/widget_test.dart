@@ -382,11 +382,11 @@ void main() {
       );
       expect(find.text('وضعیت تریلی‌ها'), findsOneWidget);
       await tester.dragUntilVisible(
-        find.text('راننده تست'),
+        find.text('کارخانه تست'),
         find.byType(Scrollable).first,
         const Offset(0, -300),
       );
-      expect(find.text('راننده تست'), findsOneWidget);
+      expect(find.text('کارخانه تست'), findsOneWidget);
     },
   );
 
@@ -407,15 +407,15 @@ void main() {
       );
 
       await tester.dragUntilVisible(
-        find.text('راننده تست'),
+        find.text('کارخانه تست'),
         find.byType(Scrollable).first,
         const Offset(0, -300),
       );
-      await tester.tap(find.text('راننده تست'));
+      await tester.tap(find.text('کارخانه تست'));
       await tester.pumpAndSettle();
 
       expect(find.text('جزئیات فاکتورها'), findsOneWidget);
-      expect(find.textContaining('کارخانه تست'), findsOneWidget);
+      expect(find.textContaining('کارخانه تست'), findsWidgets);
 
       await tester.tap(find.text('شماره فاکتور: FS-1'));
       await tester.pumpAndSettle();
