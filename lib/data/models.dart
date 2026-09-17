@@ -1057,6 +1057,51 @@ class FactorySales {
   }
 }
 
+
+class Cheque {
+  const Cheque({
+    required this.id,
+    required this.amount,
+    required this.issueDate,
+    required this.dueDate,
+    required this.partyName,
+    required this.operationType,
+    required this.description,
+    required this.direction,
+    required this.status,
+  });
+
+  final String id;
+  final int amount;
+  final String issueDate;
+  final String dueDate;
+  final String partyName;
+  final String operationType;
+  final String description;
+  /// "in" = دریافتی، "out" = پرداختی
+  final String direction;
+  final String status;
+
+  bool get isIncoming => direction == 'in';
+
+  static const _settledStatuses = {'پاس شده', 'برگشت خورده', 'تنزیل شده'};
+  bool get isSettled => _settledStatuses.contains(status);
+
+  factory Cheque.fromJson(Map<String, dynamic> json) {
+    return Cheque(
+      id: _optionalText(json['id'], fallback: ''),
+      amount: (json['amount'] as num?)?.toInt() ?? 0,
+      issueDate: _optionalText(json['issueDate'], fallback: ''),
+      dueDate: _optionalText(json['dueDate'], fallback: ''),
+      partyName: _optionalText(json['partyName'], fallback: ''),
+      operationType: _optionalText(json['operationType'], fallback: ''),
+      description: _optionalText(json['description'], fallback: ''),
+      direction: _optionalText(json['direction'], fallback: 'out'),
+      status: _optionalText(json['status'], fallback: ''),
+    );
+  }
+}
+
 class BusinessDataset {
   const BusinessDataset({
     required this.version,
@@ -1070,6 +1115,7 @@ class BusinessDataset {
     required this.prices,
     required this.storeStatus,
     required this.factorySales,
+    required this.cheques,
     required this.rawJson,
   });
 
@@ -1077,7 +1123,7 @@ class BusinessDataset {
   // بالاترین نسخه‌ای که این نسخه‌ی اندروید می‌شناسد؛ نسخه‌های بین این دو مقدار پشتیبانی می‌شوند
   // (فیلدهای هر نسخه‌ی جدید همیشه اختیاری و nullable-safe هستند، پس نسخه‌ی پایین‌تر هم بی‌خطر
   // پردازش می‌شود).
-  static const maxKnownVersion = 2;
+  static const maxKnownVersion = 3;
 
   final int version;
   final DateTime exportedAt;
@@ -1090,6 +1136,7 @@ class BusinessDataset {
   final List<PriceItem> prices;
   final StoreStatus storeStatus;
   final FactorySales factorySales;
+  final List<Cheque> cheques;
   final String rawJson;
 
   int get totalReceivable =>
@@ -1159,6 +1206,14 @@ class BusinessDataset {
       }
     }
 
+    final chequesList = json['cheques'];
+    final cheques = chequesList == null
+        ? <Cheque>[]
+        : _optionalList((chequesList as Map<String, dynamic>)['items'],
+                scope: 'چک‌ها')
+            .map((item) => Cheque.fromJson(_asMap(item, scope: 'چک')))
+            .toList(growable: false);
+
     return BusinessDataset(
       version: version,
       exportedAt: _requiredDate(json, 'exportedAt', scope: 'ریشه فایل'),
@@ -1173,6 +1228,7 @@ class BusinessDataset {
       prices: prices,
       storeStatus: StoreStatus.fromJson(json['storeStatus']),
       factorySales: FactorySales.fromJson(json['factorySales']),
+      cheques: cheques,
       rawJson: source,
     );
   }

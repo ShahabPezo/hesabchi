@@ -10,6 +10,7 @@ import 'employee_salary_screen.dart';
 import 'factory_sales_screen.dart';
 import 'home_screen.dart';
 import 'invoices_screen.dart';
+import 'cheques_screen.dart';
 import 'prices_screen.dart';
 import 'settings_screen.dart';
 import 'statistics_screen.dart';
@@ -37,6 +38,7 @@ enum _MoreDestination {
   customerDirectory,
   storeStatus,
   factorySales,
+  prices,
   settings,
 }
 
@@ -44,7 +46,7 @@ class _MainShellState extends State<MainShell> {
   var _index = 0;
   var _exitDialogOpen = false;
 
-  static const _titles = ['خانه', 'مشتری‌ها', 'قیمت‌ها', 'آمار'];
+  static const _titles = ['خانه', 'مشتری‌ها', 'چک‌ها', 'آمار'];
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +54,7 @@ class _MainShellState extends State<MainShell> {
     final pages = [
       HomeScreen(onImport: widget.onImport),
       const CustomersScreen(),
-      const PricesScreen(),
+      const ChequesScreen(),
       StatisticsScreen(onImport: widget.onImport),
     ];
     return PopScope<Object?>(
@@ -105,9 +107,9 @@ class _MainShellState extends State<MainShell> {
               label: 'مشتری‌ها',
             ),
             NavigationDestination(
-              icon: Icon(Icons.sell_outlined),
-              selectedIcon: Icon(Icons.sell),
-              label: 'قیمت‌ها',
+              icon: Icon(Icons.receipt_outlined),
+              selectedIcon: Icon(Icons.receipt),
+              label: 'چک‌ها',
             ),
             NavigationDestination(
               icon: Icon(Icons.bar_chart_outlined),
@@ -184,6 +186,14 @@ class _MainShellState extends State<MainShell> {
               ),
               const Divider(height: 1),
               _MoreMenuTile(
+                icon: Icons.sell_outlined,
+                title: 'قیمت‌ها',
+                subtitle: 'قیمت کالاها و محصولات',
+                onTap: () =>
+                    Navigator.of(sheetContext).pop(_MoreDestination.prices),
+              ),
+              const Divider(height: 1),
+              _MoreMenuTile(
                 icon: Icons.settings_outlined,
                 title: 'تنظیمات',
                 subtitle: 'نمایش، داده‌ها و به‌روزرسانی',
@@ -218,6 +228,10 @@ class _MainShellState extends State<MainShell> {
           _MoreDestination.factorySales => Scaffold(
             appBar: AppBar(title: const Text('فروش به کارخانه‌ها')),
             body: const FactorySalesScreen(),
+          ),
+          _MoreDestination.prices => Scaffold(
+            appBar: AppBar(title: const Text('قیمت‌ها')),
+            body: const PricesScreen(),
           ),
           _MoreDestination.settings => Scaffold(
             appBar: AppBar(title: const Text('تنظیمات')),
