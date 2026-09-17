@@ -9,6 +9,7 @@ class FactoryStatusResult {
     required this.totalGross,
     required this.totalNet,
     required this.totalCargo,
+    required this.totalRent,
     required this.moistureLossPct,
     required this.initialPrice,
     required this.finalPrice,
@@ -21,6 +22,7 @@ class FactoryStatusResult {
   final num totalGross;
   final num totalNet;
   final int totalCargo;
+  final int totalRent;
   final double moistureLossPct;
   final double initialPrice;
   final double finalPrice;
@@ -79,6 +81,7 @@ class FactoryStatusResult {
       totalGross: totalGross,
       totalNet: totalNet,
       totalCargo: totalCargo,
+      totalRent: totalRent,
       moistureLossPct: moistureLossPct,
       initialPrice: initialPrice,
       finalPrice: finalPrice,
