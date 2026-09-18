@@ -1,7 +1,7 @@
 name: namayeshyar
 description: "حسابچی؛ نمایش آفلاین مشتریان، فاکتورها و قیمت‌ها"
 publish_to: 'none'
-version: 1.6.1+18
+version: 1.6.2+19
 
 environment:
   sdk: ^3.13.1
