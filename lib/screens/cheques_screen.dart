@@ -18,19 +18,31 @@ enum _ChequeFilter { all, incoming, outgoing }
 
 class _ChequesScreenState extends State<ChequesScreen> {
   _ChequeFilter _filter = _ChequeFilter.all;
+  final _search = TextEditingController();
 
   static const _settledStatuses = {'پاس شده', 'برگشت خورده', 'تنزیل شده'};
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final allCheques = context.watch<AppController>().dataset!.cheques;
 
+    final query = _search.text.trim();
     final filtered = allCheques.where((c) {
-      return switch (_filter) {
+      final matchesFilter = switch (_filter) {
         _ChequeFilter.all => true,
         _ChequeFilter.incoming => c.isIncoming,
         _ChequeFilter.outgoing => !c.isIncoming,
       };
+      final matchesSearch = query.isEmpty ||
+          c.partyName.contains(query) ||
+          c.description.contains(query);
+      return matchesFilter && matchesSearch;
     }).toList()
       ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
 
@@ -40,7 +52,28 @@ class _ChequesScreenState extends State<ChequesScreen> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+          child: TextField(
+            controller: _search,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              hintText: 'جست‌وجو بر اساس نام یا شماره چک',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _search.text.isEmpty
+                  ? null
+                  : IconButton(
+                      tooltip: 'پاک کردن',
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        _search.clear();
+                        setState(() {});
+                      },
+                    ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
           child: SegmentedButton<_ChequeFilter>(
             segments: const [
               ButtonSegment(
@@ -172,7 +205,7 @@ class _ChequeCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          formatMoney(cheque.amount ~/ 10, compact: false),
+                          formatMoney(cheque.amount, compact: false),
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 color: color,
@@ -190,13 +223,13 @@ class _ChequeCard extends StatelessWidget {
                     if (cheque.issueDate.isNotEmpty)
                       _InfoRow(
                         icon: Icons.calendar_today_outlined,
-                        label: 'ثبت',
+                        label: 'تاریخ فاکتور',
                         value: cheque.issueDate,
                       ),
                     if (cheque.description.isNotEmpty)
                       _InfoRow(
-                        icon: Icons.notes_outlined,
-                        label: 'توضیحات',
+                        icon: Icons.tag_outlined,
+                        label: 'شماره چک',
                         value: cheque.description,
                       ),
                     const SizedBox(height: 4),
