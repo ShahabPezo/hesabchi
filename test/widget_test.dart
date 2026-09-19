@@ -375,17 +375,9 @@ void main() {
       );
 
       expect(find.text('وضعیت کارخانه'), findsOneWidget);
-      await tester.dragUntilVisible(
-        find.text('وضعیت تریلی‌ها'),
-        find.byType(Scrollable).first,
-        const Offset(0, -300),
-      );
+      await _scrollToVisible(tester, find.text('وضعیت تریلی‌ها'));
       expect(find.text('وضعیت تریلی‌ها'), findsOneWidget);
-      await tester.dragUntilVisible(
-        find.text('کارخانه تست'),
-        find.byType(Scrollable).first,
-        const Offset(0, -300),
-      );
+      await _scrollToVisible(tester, find.text('کارخانه تست'));
       expect(find.text('کارخانه تست'), findsOneWidget);
     },
   );
@@ -406,11 +398,7 @@ void main() {
         ),
       );
 
-      await tester.dragUntilVisible(
-        find.text('کارخانه تست'),
-        find.byType(Scrollable).first,
-        const Offset(0, -300),
-      );
+      await _scrollToVisible(tester, find.text('کارخانه تست'));
       await tester.tap(find.text('کارخانه تست'));
       await tester.pumpAndSettle();
 
@@ -716,6 +704,35 @@ Future<void> _pumpHome(WidgetTester tester, String source) async {
 void _noOp() {}
 
 Future<void> _noOpAsync() async {}
+
+/// تمام Scrollable های موجود در widget tree را امتحان می‌کند تا [finder] را
+/// visible کند. اگر widget از قبل visible باشد یا پیدا نشود، بدون خطا ادامه
+/// می‌دهد — [expect] بعد از آن نتیجه واقعی را مشخص می‌کند.
+Future<void> _scrollToVisible(
+  WidgetTester tester,
+  Finder finder, {
+  double delta = -300,
+  int maxScrollsPerScrollable = 15,
+}) async {
+  await tester.pumpAndSettle();
+  if (finder.evaluate().isNotEmpty) return;
+
+  final scrollableCount = find.byType(Scrollable).evaluate().length;
+  for (var s = 0; s < scrollableCount; s++) {
+    for (var i = 0; i < maxScrollsPerScrollable; i++) {
+      await tester.drag(
+        find.byType(Scrollable).at(s),
+        Offset(0, delta),
+      );
+      await tester.pump(const Duration(milliseconds: 50));
+      if (finder.evaluate().isNotEmpty) {
+        await tester.pumpAndSettle();
+        return;
+      }
+    }
+  }
+  await tester.pumpAndSettle();
+}
 
 class _DatasetController extends AppController {
   _DatasetController(this._testDataset);
