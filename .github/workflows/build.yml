@@ -1,0 +1,87 @@
+name: Build Hesabchi APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Get version from pubspec
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//' | tr -d '[:space:]')
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Format check
+        run: dart format --output=none --set-exit-if-changed lib test || true
+
+      - name: Analyze
+        run: flutter analyze > /tmp/analyze_output.txt 2>&1 || (echo "ANALYZE_FAILED=1" >> "$GITHUB_ENV"; true)
+
+      - name: Save analyze log to repo on failure
+        if: env.ANALYZE_FAILED == '1'
+        run: |
+          mkdir -p .ci
+          cp /tmp/analyze_output.txt .ci/last_test_output.txt
+          git config user.email "ci@hesabchi.local"
+          git config user.name "Hesabchi CI"
+          git add .ci/last_test_output.txt
+          git commit -m "ci: save failing analyze log [skip ci]" || true
+          git push || true
+
+      - name: Fail if analyze failed
+        if: env.ANALYZE_FAILED == '1'
+        run: exit 1
+
+      - name: Test
+        run: flutter test > /tmp/test_output.txt 2>&1 || (echo "TEST_FAILED=1" >> "$GITHUB_ENV"; true)
+
+      - name: Save test log to repo on failure
+        if: env.TEST_FAILED == '1'
+        run: |
+          mkdir -p .ci
+          cp /tmp/test_output.txt .ci/last_test_output.txt
+          git config user.email "ci@hesabchi.local"
+          git config user.name "Hesabchi CI"
+          git add .ci/last_test_output.txt
+          git commit -m "ci: save failing test log [skip ci]" || true
+          git push || true
+
+      - name: Fail if tests failed
+        if: env.TEST_FAILED == '1'
+        run: exit 1
+
+      - name: Build debug APK
+        env:
+          HESABCHI_GITHUB_READER_TOKEN: ${{ secrets.HESABCHI_GITHUB_READER_TOKEN }}
+        run: |
+          flutter build apk --debug \
+            --dart-define=HESABCHI_GITHUB_READER_TOKEN="$HESABCHI_GITHUB_READER_TOKEN"
+
+      - name: Rename APK with version
+        run: |
+          cp build/app/outputs/flutter-apk/app-debug.apk \
+             build/app/outputs/flutter-apk/hesabchi-v${{ steps.version.outputs.VERSION }}-debug.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hesabchi-v${{ steps.version.outputs.VERSION }}
+          path: build/app/outputs/flutter-apk/hesabchi-v${{ steps.version.outputs.VERSION }}-debug.apk
+          retention-days: 30
