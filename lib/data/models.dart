@@ -1110,8 +1110,6 @@ class Cheque {
 
   bool get isIncoming => direction == 'in';
 
-  // چک‌های فعال دریافتی
-  static const _activeInStatuses = {'دست ماست', 'پشتوانه صادره'};
   // چک‌های غیرفعال (تسویه‌شده)
   static const _settledStatuses = {
     'پاس شده', 'برگشت خورده', 'تنزیل شده',
