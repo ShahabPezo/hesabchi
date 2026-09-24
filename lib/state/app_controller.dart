@@ -54,6 +54,7 @@ class AppController extends ChangeNotifier {
 
   static const _themePreferenceKey = 'theme_mode';
   static const _githubLastSyncKey = 'github_last_sync_exported_at';
+  static const _githubTokenKey = 'github_reader_token';
 
   final LocalStore _store;
   final ImportService _importer;
@@ -65,6 +66,7 @@ class AppController extends ChangeNotifier {
   bool _isSyncing = false;
   String? _lastImportSource;
   DateTime? _lastGitHubSyncExportedAt;
+  String? _customGitHubToken;
 
   BusinessDataset? get dataset => _dataset;
   ThemeMode get themeMode => _themeMode;
@@ -74,6 +76,7 @@ class AppController extends ChangeNotifier {
   bool get hasData => _dataset != null;
   String? get lastImportSource => _lastImportSource;
   DateTime? get lastGitHubSyncExportedAt => _lastGitHubSyncExportedAt;
+  String? get customGitHubToken => _customGitHubToken;
 
   Future<void> initialize() async {
     final preferences = await SharedPreferences.getInstance();
@@ -88,6 +91,7 @@ class AppController extends ChangeNotifier {
     _lastGitHubSyncExportedAt = rawLastSync == null
         ? null
         : DateTime.tryParse(rawLastSync)?.toLocal();
+    _customGitHubToken = preferences.getString(_githubTokenKey);
     _isLoading = false;
     notifyListeners();
   }
@@ -186,7 +190,19 @@ class AppController extends ChangeNotifier {
     _isSyncing = true;
     notifyListeners();
     try {
-      final fetched = await _githubSync.fetchLatest(
+      final syncService = _customGitHubToken != null && _customGitHubToken!.isNotEmpty
+          ? GitHubSyncService(
+              config: GitHubSyncConfig(
+                owner: GitHubSyncConfig.production().owner,
+                repository: GitHubSyncConfig.production().repository,
+                branch: GitHubSyncConfig.production().branch,
+                metaPath: GitHubSyncConfig.production().metaPath,
+                hchPath: GitHubSyncConfig.production().hchPath,
+                readerToken: _customGitHubToken!,
+              ),
+            )
+          : _githubSync;
+      final fetched = await syncService.fetchLatest(
         currentExportedAt: _dataset?.exportedAt,
       );
       final preferences = await SharedPreferences.getInstance();
@@ -214,11 +230,11 @@ class AppController extends ChangeNotifier {
       );
     } on ImportValidationException {
       return const GitHubSyncResult.failure(
-        'به‌روزرسانی انجام نشد. لطفاً اتصال اینترنت را بررسی کرده و دوباره تلاش کنید.',
+        'فایل دریافت‌شده از GitHub معتبر نیست. لطفاً بعداً دوباره تلاش کنید.',
       );
     } on GitHubSyncException {
       return const GitHubSyncResult.failure(
-        'به‌روزرسانی انجام نشد. لطفاً اتصال اینترنت را بررسی کرده و دوباره تلاش کنید.',
+        'دریافت از GitHub ممکن نشد. احتمالاً توکن دسترسی منقضی یا نادرست است.',
       );
     } catch (_) {
       return const GitHubSyncResult.failure(
@@ -243,6 +259,30 @@ class AppController extends ChangeNotifier {
     } catch (_) {
       // داده جدید قبلاً به‌صورت اتمی ذخیره شده و همچنان معتبر است.
     }
+  }
+
+  Future<void> setGitHubToken(String token) async {
+    final trimmed = token.trim();
+    _customGitHubToken = trimmed.isEmpty ? null : trimmed;
+    final preferences = await SharedPreferences.getInstance();
+    if (trimmed.isEmpty) {
+      await preferences.remove(_githubTokenKey);
+    } else {
+      await preferences.setString(_githubTokenKey, trimmed);
+    }
+    // سرویس sync رو با توکن جدید بازسازی کن
+    if (_customGitHubToken != null) {
+      final config = GitHubSyncConfig(
+        owner: GitHubSyncConfig.production().owner,
+        repository: GitHubSyncConfig.production().repository,
+        branch: GitHubSyncConfig.production().branch,
+        metaPath: GitHubSyncConfig.production().metaPath,
+        hchPath: GitHubSyncConfig.production().hchPath,
+        readerToken: _customGitHubToken!,
+      );
+      (_githubSync as dynamic)._config = config;
+    }
+    notifyListeners();
   }
 
   Future<void> clearData() async {

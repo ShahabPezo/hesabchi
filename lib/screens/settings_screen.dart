@@ -126,6 +126,21 @@ class SettingsScreen extends StatelessWidget {
                 trailing: const Icon(Icons.chevron_left),
                 onTap: () => _confirmClear(context),
               ),
+              const Divider(indent: 16, endIndent: 16),
+              ListTile(
+                leading: const Icon(
+                  Icons.key_outlined,
+                  color: AppColors.primary,
+                ),
+                title: const Text('توکن دسترسی GitHub'),
+                subtitle: Text(
+                  controller.customGitHubToken?.isNotEmpty == true
+                      ? 'توکن سفارشی تنظیم شده'
+                      : 'از توکن پیش‌فرض استفاده می‌شود',
+                ),
+                trailing: const Icon(Icons.chevron_left),
+                onTap: () => _editToken(context, controller),
+              ),
             ],
           ),
         ),
@@ -138,6 +153,68 @@ class SettingsScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _editToken(
+    BuildContext context,
+    AppController controller,
+  ) async {
+    final current = controller.customGitHubToken ?? '';
+    final textController = TextEditingController(text: current);
+    final result = await showDialog<String?>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('توکن دسترسی GitHub'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'توکن Personal Access Token (PAT) با دسترسی read به ریپوی sync را وارد کنید.',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                hintText: 'ghp_...',
+                labelText: 'توکن GitHub',
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(null),
+            child: const Text('انصراف'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(''),
+            child: const Text('حذف توکن', style: TextStyle(color: Colors.red)),
+          ),
+          FilledButton(
+            onPressed: () =>
+                Navigator.of(dialogContext).pop(textController.text),
+            child: const Text('ذخیره'),
+          ),
+        ],
+      ),
+    );
+    textController.dispose();
+    if (result == null || !context.mounted) return;
+    await context.read<AppController>().setGitHubToken(result);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result.trim().isEmpty
+                ? 'توکن سفارشی حذف شد.'
+                : 'توکن با موفقیت ذخیره شد.',
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _confirmClear(BuildContext context) async {
