@@ -16,26 +16,37 @@ class ChequesScreen extends StatefulWidget {
 
 enum _ChequeFilter { all, incoming, outgoing }
 
-class _ChequesScreenState extends State<ChequesScreen> {
+class _ChequesScreenState extends State<ChequesScreen>
+    with SingleTickerProviderStateMixin {
   _ChequeFilter _filter = _ChequeFilter.all;
   final _search = TextEditingController();
+  late final TabController _tabController;
 
+  // وضعیت‌های تسویه‌شده
   static const _settledStatuses = {
-    'پاس شده', 'برگشت خورده', 'تنزیل شده',
-    'برداشت مدیر', 'منتقل شده', 'برگشت داده شده',
+    'پاس شده',
+    'برگشت خورده',
+    'تنزیل شده',
   };
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
 
   @override
   void dispose() {
     _search.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final allCheques = context.watch<AppController>().dataset!.cheques;
-
     final query = _search.text.trim();
+
     final filtered = allCheques.where((c) {
       final matchesFilter = switch (_filter) {
         _ChequeFilter.all => true,
@@ -50,8 +61,10 @@ class _ChequesScreenState extends State<ChequesScreen> {
     }).toList()
       ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
 
-    final active = filtered.where((c) => !_settledStatuses.contains(c.status)).toList();
-    final settled = filtered.where((c) => _settledStatuses.contains(c.status)).toList();
+    final active =
+        filtered.where((c) => !_settledStatuses.contains(c.status)).toList();
+    final settled =
+        filtered.where((c) => _settledStatuses.contains(c.status)).toList();
 
     return Column(
       children: [
@@ -100,61 +113,99 @@ class _ChequesScreenState extends State<ChequesScreen> {
             onSelectionChanged: (s) => setState(() => _filter = s.first),
           ),
         ),
+        TabBar(
+          controller: _tabController,
+          tabs: [
+            Tab(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('فعال'),
+                  const SizedBox(width: 6),
+                  _CountBadge(count: active.length, color: AppColors.primary),
+                ],
+              ),
+            ),
+            Tab(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('سررسید گذشته'),
+                  const SizedBox(width: 6),
+                  _CountBadge(
+                    count: settled.length,
+                    color: AppColors.mutedText,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         Expanded(
-          child: filtered.isEmpty
-              ? const EmptyListNotice(text: 'چکی برای نمایش وجود ندارد.')
-              : ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-                  children: [
-                    if (active.isNotEmpty) ...[
-                      _SectionLabel(
-                        label: 'فعال',
-                        count: active.length,
-                      ),
-                      const SizedBox(height: 8),
-                      ...active.map((c) => _ChequeCard(cheque: c)),
-                    ],
-                    if (settled.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      _SectionLabel(
-                        label: 'تسویه‌شده',
-                        count: settled.length,
-                        muted: true,
-                      ),
-                      const SizedBox(height: 8),
-                      ...settled.map((c) => _ChequeCard(cheque: c, muted: true)),
-                    ],
-                  ],
-                ),
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _ChequeList(cheques: active, emptyText: 'چک فعالی وجود ندارد.'),
+              _ChequeList(
+                cheques: settled,
+                emptyText: 'چک سررسید گذشته‌ای وجود ندارد.',
+                muted: true,
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({
-    required this.label,
-    required this.count,
+class _CountBadge extends StatelessWidget {
+  const _CountBadge({required this.count, required this.color});
+
+  final int count;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        toPersianDigits(count.toString()),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
+
+class _ChequeList extends StatelessWidget {
+  const _ChequeList({
+    required this.cheques,
+    required this.emptyText,
     this.muted = false,
   });
 
-  final String label;
-  final int count;
+  final List<Cheque> cheques;
+  final String emptyText;
   final bool muted;
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: muted ? AppColors.mutedText : AppColors.primary,
-          fontWeight: FontWeight.w700,
-        );
-    return Row(
-      children: [
-        Text(label, style: style),
-        const SizedBox(width: 6),
-        Text('(${toPersianDigits(count.toString())})', style: style),
-      ],
+    if (cheques.isEmpty) {
+      return EmptyListNotice(text: emptyText);
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+      itemCount: cheques.length,
+      itemBuilder: (context, index) =>
+          _ChequeCard(cheque: cheques[index], muted: muted),
     );
   }
 }
@@ -209,7 +260,7 @@ class _ChequeCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          formatMoney(cheque.amount, compact: false),
+                          formatMoney(cheque.amount ~/ 10, compact: false),
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 color: color,
@@ -236,16 +287,10 @@ class _ChequeCard extends StatelessWidget {
                         label: 'شماره چک',
                         value: cheque.checkNumber,
                       )
-                    else
+                    else if (cheque.description.isNotEmpty)
                       _InfoRow(
                         icon: Icons.tag_outlined,
                         label: 'شماره چک',
-                        value: 'ثبت نشده',
-                      ),
-                    if (cheque.description.isNotEmpty)
-                      _InfoRow(
-                        icon: Icons.notes_outlined,
-                        label: 'توضیحات',
                         value: cheque.description,
                       ),
                     const SizedBox(height: 4),
@@ -259,7 +304,7 @@ class _ChequeCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        cheque.status.isEmpty ? '—' : cheque.status,
+                        cheque.status.isEmpty ? 'وضعیت نامشخص' : cheque.status,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
