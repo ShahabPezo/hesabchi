@@ -280,6 +280,22 @@ class _DataIntakePageState extends State<DataIntakePage> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('حسابچی'),
+            leading: IconButton(
+              tooltip: controller.themeMode == ThemeMode.dark
+                  ? 'حالت روشن'
+                  : 'حالت تیره',
+              icon: Icon(
+                controller.themeMode == ThemeMode.dark
+                    ? Icons.light_mode_outlined
+                    : Icons.dark_mode_outlined,
+              ),
+              onPressed: () {
+                final next = controller.themeMode == ThemeMode.dark
+                    ? ThemeMode.light
+                    : ThemeMode.dark;
+                context.read<AppController>().setThemeMode(next);
+              },
+            ),
             actions: [
               IconButton(
                 tooltip: 'ورود فایل جدید',

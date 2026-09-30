@@ -270,18 +270,8 @@ class AppController extends ChangeNotifier {
     } else {
       await preferences.setString(_githubTokenKey, trimmed);
     }
-    // سرویس sync رو با توکن جدید بازسازی کن
-    if (_customGitHubToken != null) {
-      final config = GitHubSyncConfig(
-        owner: GitHubSyncConfig.production().owner,
-        repository: GitHubSyncConfig.production().repository,
-        branch: GitHubSyncConfig.production().branch,
-        metaPath: GitHubSyncConfig.production().metaPath,
-        hchPath: GitHubSyncConfig.production().hchPath,
-        readerToken: _customGitHubToken!,
-      );
-      (_githubSync as dynamic)._config = config;
-    }
+    // توکن در _customGitHubToken ذخیره شده و syncFromGitHub هر بار از آن استفاده می‌کند
+    // نیازی به تغییر مستقیم _githubSync نیست
     notifyListeners();
   }
 
