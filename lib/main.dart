@@ -195,54 +195,51 @@ class _DataIntakePageState extends State<DataIntakePage> {
   Future<void> _showTokenDialog(BuildContext context) async {
     final controller = context.read<AppController>();
     final current = controller.customGitHubToken ?? '';
+    final textController = TextEditingController(text: current);
     String? result;
-    showDialog<void>(
+    await showDialog<void>(
       context: context,
-      builder: (dialogContext) {
-        final textController = TextEditingController(text: current);
-        return AlertDialog(
-          title: const Text('توکن دسترسی GitHub'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'برای دریافت آنلاین، توکن GitHub را وارد کنید.',
-                style: TextStyle(fontSize: 13),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: textController,
-                decoration: const InputDecoration(
-                  hintText: 'ghp_...',
-                  labelText: 'توکن GitHub',
-                ),
-                maxLines: 2,
-                autofocus: true,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                result = null;
-                textController.dispose();
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('انصراف'),
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('توکن دسترسی GitHub'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'برای دریافت آنلاین، توکن GitHub را وارد کنید.',
+              style: TextStyle(fontSize: 13),
             ),
-            FilledButton(
-              onPressed: () {
-                result = textController.text;
-                textController.dispose();
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('ذخیره'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                hintText: 'ghp_...',
+                labelText: 'توکن GitHub',
+              ),
+              maxLines: 2,
+              autofocus: true,
             ),
           ],
-        );
-      },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              result = null;
+              Navigator.of(dialogContext).pop();
+            },
+            child: const Text('انصراف'),
+          ),
+          FilledButton(
+            onPressed: () {
+              result = textController.text;
+              Navigator.of(dialogContext).pop();
+            },
+            child: const Text('ذخیره'),
+          ),
+        ],
+      ),
     );
+    textController.dispose();
     if (result == null || result!.trim().isEmpty) return;
     await controller.setGitHubToken(result!);
     if (!mounted) return;

@@ -161,65 +161,61 @@ class SettingsScreen extends StatelessWidget {
   ) async {
     final current = controller.customGitHubToken ?? '';
     // textController در داخل dialog ساخته و dispose می‌شه
+    final textController = TextEditingController(text: current);
     String? result;
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) {
-        final textController = TextEditingController(text: current);
-        return AlertDialog(
-          title: const Text('توکن دسترسی GitHub'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'توکن Personal Access Token (PAT) با دسترسی read به ریپوی sync را وارد کنید.',
-                style: TextStyle(fontSize: 13),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: textController,
-                decoration: const InputDecoration(
-                  hintText: 'ghp_...',
-                  labelText: 'توکن GitHub',
-                ),
-                maxLines: 2,
-                autofocus: true,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                result = null;
-                textController.dispose();
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('انصراف'),
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('توکن دسترسی GitHub'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'توکن Personal Access Token (PAT) با دسترسی read به ریپوی sync را وارد کنید.',
+              style: TextStyle(fontSize: 13),
             ),
-            TextButton(
-              onPressed: () {
-                result = '';
-                textController.dispose();
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text(
-                'حذف توکن',
-                style: TextStyle(color: Colors.red),
+            const SizedBox(height: 12),
+            TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                hintText: 'ghp_...',
+                labelText: 'توکن GitHub',
               ),
-            ),
-            FilledButton(
-              onPressed: () {
-                result = textController.text;
-                textController.dispose();
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('ذخیره'),
+              maxLines: 2,
+              autofocus: true,
             ),
           ],
-        );
-      },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              result = null;
+              Navigator.of(dialogContext).pop();
+            },
+            child: const Text('انصراف'),
+          ),
+          TextButton(
+            onPressed: () {
+              result = '';
+              Navigator.of(dialogContext).pop();
+            },
+            child: const Text(
+              'حذف توکن',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+          FilledButton(
+            onPressed: () {
+              result = textController.text;
+              Navigator.of(dialogContext).pop();
+            },
+            child: const Text('ذخیره'),
+          ),
+        ],
+      ),
     );
+    textController.dispose();
     if (result == null || !context.mounted) return;
     await context.read<AppController>().setGitHubToken(result!);
     if (context.mounted) {
