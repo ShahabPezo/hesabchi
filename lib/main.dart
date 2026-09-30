@@ -192,7 +192,7 @@ class _DataIntakePageState extends State<DataIntakePage> {
     );
   }
 
-  void _showTokenDialog(BuildContext context) {
+  Future<void> _showTokenDialog(BuildContext context) async {
     final controller = context.read<AppController>();
     final current = controller.customGitHubToken ?? '';
     String? result;
@@ -242,14 +242,14 @@ class _DataIntakePageState extends State<DataIntakePage> {
           ],
         );
       },
-    ).then((_) async {
-      if (result == null || result!.trim().isEmpty) return;
-      await controller.setGitHubToken(result!);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('توکن با موفقیت ذخیره شد.')),
-      );
-    });
+    );
+    if (result == null || result!.trim().isEmpty) return;
+    await controller.setGitHubToken(result!);
+    if (!mounted) return;
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('توکن با موفقیت ذخیره شد.')),
+    );
   }
 
   void _onDataCleared() {
