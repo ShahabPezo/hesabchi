@@ -192,6 +192,66 @@ class _DataIntakePageState extends State<DataIntakePage> {
     );
   }
 
+  void _showTokenDialog(BuildContext context) {
+    final controller = context.read<AppController>();
+    final current = controller.customGitHubToken ?? '';
+    String? result;
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        final textController = TextEditingController(text: current);
+        return AlertDialog(
+          title: const Text('توکن دسترسی GitHub'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'برای دریافت آنلاین، توکن GitHub را وارد کنید.',
+                style: TextStyle(fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: textController,
+                decoration: const InputDecoration(
+                  hintText: 'ghp_...',
+                  labelText: 'توکن GitHub',
+                ),
+                maxLines: 2,
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                result = null;
+                textController.dispose();
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('انصراف'),
+            ),
+            FilledButton(
+              onPressed: () {
+                result = textController.text;
+                textController.dispose();
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('ذخیره'),
+            ),
+          ],
+        );
+      },
+    ).then((_) async {
+      if (result == null || result!.trim().isEmpty) return;
+      await controller.setGitHubToken(result!);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('توکن با موفقیت ذخیره شد.')),
+      );
+    });
+  }
+
   void _onDataCleared() {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -239,6 +299,7 @@ class _DataIntakePageState extends State<DataIntakePage> {
                 onSync: _syncFromGitHub,
                 isImporting: controller.isImporting,
                 isSyncing: controller.isSyncing,
+                onSetToken: _showTokenDialog,
               ),
             ),
           ),
@@ -387,12 +448,14 @@ class _EmptyDataState extends StatelessWidget {
     required this.onSync,
     required this.isImporting,
     required this.isSyncing,
+    required this.onSetToken,
   });
 
   final VoidCallback onImport;
   final Future<void> Function() onSync;
   final bool isImporting;
   final bool isSyncing;
+  final void Function(BuildContext context) onSetToken;
 
   @override
   Widget build(BuildContext context) {
@@ -461,6 +524,17 @@ class _EmptyDataState extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium
               ?.copyWith(color: AppColors.mutedText),
+        ),
+        const SizedBox(height: 24),
+        const Divider(),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          onPressed: () => onSetToken(context),
+          icon: const Icon(Icons.key_outlined, size: 18),
+          label: const Text('تنظیم توکن دسترسی GitHub'),
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.mutedText,
+          ),
         ),
       ],
     );

@@ -260,7 +260,7 @@ class _ChequeCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          formatMoney(cheque.amount ~/ 10, compact: false),
+                          formatMoney(cheque.amount, compact: false),
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 color: color,
