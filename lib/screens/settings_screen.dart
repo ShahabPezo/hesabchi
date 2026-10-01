@@ -5,6 +5,7 @@ import '../app_metadata.dart';
 import '../app_theme.dart';
 import '../core/formatters.dart';
 import '../state/app_controller.dart';
+import '../widgets/token_dialog.dart';
 import '../widgets/ui_components.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -159,76 +160,21 @@ class SettingsScreen extends StatelessWidget {
     BuildContext context,
     AppController controller,
   ) async {
-    final current = controller.customGitHubToken ?? '';
-    // textController در داخل dialog ساخته و dispose می‌شه
-    final textController = TextEditingController(text: current);
-    String? result;
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('توکن دسترسی GitHub'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'توکن Personal Access Token (PAT) با دسترسی read به ریپوی sync را وارد کنید.',
-              style: TextStyle(fontSize: 13),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: textController,
-              decoration: const InputDecoration(
-                hintText: 'ghp_...',
-                labelText: 'توکن GitHub',
-              ),
-              maxLines: 2,
-              autofocus: true,
-            ),
-          ],
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await showTokenDialog(
+      context,
+      initialValue: controller.customGitHubToken ?? '',
+      allowDelete: true,
+    );
+    if (result == null) return;
+    await controller.setGitHubToken(result);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          result.isEmpty ? 'توکن سفارشی حذف شد.' : 'توکن با موفقیت ذخیره شد.',
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              result = null;
-              Navigator.of(dialogContext).pop();
-            },
-            child: const Text('انصراف'),
-          ),
-          TextButton(
-            onPressed: () {
-              result = '';
-              Navigator.of(dialogContext).pop();
-            },
-            child: const Text(
-              'حذف توکن',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-          FilledButton(
-            onPressed: () {
-              result = textController.text;
-              Navigator.of(dialogContext).pop();
-            },
-            child: const Text('ذخیره'),
-          ),
-        ],
       ),
     );
-    textController.dispose();
-    if (result == null || !context.mounted) return;
-    await context.read<AppController>().setGitHubToken(result!);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            result!.trim().isEmpty
-                ? 'توکن سفارشی حذف شد.'
-                : 'توکن با موفقیت ذخیره شد.',
-          ),
-        ),
-      );
-    }
   }
 
   Future<void> _confirmClear(BuildContext context) async {

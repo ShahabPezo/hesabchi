@@ -264,15 +264,14 @@ class AppController extends ChangeNotifier {
   Future<void> setGitHubToken(String token) async {
     final trimmed = token.trim();
     _customGitHubToken = trimmed.isEmpty ? null : trimmed;
+    // notifyListeners قبل از await صدا زده می‌شه تا widget dispose نشده باشه
+    notifyListeners();
     final preferences = await SharedPreferences.getInstance();
     if (trimmed.isEmpty) {
       await preferences.remove(_githubTokenKey);
     } else {
       await preferences.setString(_githubTokenKey, trimmed);
     }
-    // توکن در _customGitHubToken ذخیره شده و syncFromGitHub هر بار از آن استفاده می‌کند
-    // نیازی به تغییر مستقیم _githubSync نیست
-    notifyListeners();
   }
 
   Future<void> clearData() async {

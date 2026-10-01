@@ -9,6 +9,7 @@ import 'app_metadata.dart';
 import 'app_theme.dart';
 import 'screens/main_shell.dart';
 import 'state/app_controller.dart';
+import 'widgets/token_dialog.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -194,57 +195,14 @@ class _DataIntakePageState extends State<DataIntakePage> {
 
   Future<void> _showTokenDialog(BuildContext context) async {
     final controller = context.read<AppController>();
-    final current = controller.customGitHubToken ?? '';
-    final textController = TextEditingController(text: current);
-    String? result;
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('توکن دسترسی GitHub'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'برای دریافت آنلاین، توکن GitHub را وارد کنید.',
-              style: TextStyle(fontSize: 13),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: textController,
-              decoration: const InputDecoration(
-                hintText: 'ghp_...',
-                labelText: 'توکن GitHub',
-              ),
-              maxLines: 2,
-              autofocus: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              result = null;
-              Navigator.of(dialogContext).pop();
-            },
-            child: const Text('انصراف'),
-          ),
-          FilledButton(
-            onPressed: () {
-              result = textController.text;
-              Navigator.of(dialogContext).pop();
-            },
-            child: const Text('ذخیره'),
-          ),
-        ],
-      ),
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await showTokenDialog(
+      context,
+      initialValue: controller.customGitHubToken ?? '',
     );
-    textController.dispose();
-    if (result == null || result!.trim().isEmpty) return;
-    await controller.setGitHubToken(result!);
-    if (!mounted) return;
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
+    if (result == null || result.isEmpty) return;
+    await controller.setGitHubToken(result);
+    messenger.showSnackBar(
       const SnackBar(content: Text('توکن با موفقیت ذخیره شد.')),
     );
   }
