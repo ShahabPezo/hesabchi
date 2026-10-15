@@ -47,7 +47,7 @@ class GitHubSyncConfig {
   Uri contentUri(String path, {String? cacheBust}) => Uri.https(
     'api.github.com',
     '/repos/$owner/$repository/contents/$path',
-    {'ref': branch, if (cacheBust != null) 't': cacheBust},
+    {'ref': branch, 't': ?cacheBust},
   );
 }
 
