@@ -232,9 +232,11 @@ class AppController extends ChangeNotifier {
       return const GitHubSyncResult.failure(
         'فایل دریافت‌شده از GitHub معتبر نیست. لطفاً بعداً دوباره تلاش کنید.',
       );
-    } on GitHubSyncException {
-      return const GitHubSyncResult.failure(
-        'دریافت از GitHub ممکن نشد. احتمالاً توکن دسترسی منقضی یا نادرست است.',
+    } on GitHubSyncException catch (error) {
+      return GitHubSyncResult.failure(
+        error.dataCorrupt
+            ? 'فایل دریافت‌شده از GitHub سالم نیست؛ داده‌ی قبلی شما حفظ شد. چند دقیقه بعد دوباره تلاش کنید.'
+            : 'دریافت از GitHub ممکن نشد. احتمالاً توکن دسترسی منقضی یا نادرست است.',
       );
     } catch (_) {
       return const GitHubSyncResult.failure(

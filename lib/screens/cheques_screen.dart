@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 
 import '../app_theme.dart';
 import '../core/formatters.dart';
@@ -22,12 +23,13 @@ class _ChequesScreenState extends State<ChequesScreen>
   final _search = TextEditingController();
   late final TabController _tabController;
 
-  // وضعیت‌های تسویه‌شده
-  static const _settledStatuses = {
-    'پاس شده',
-    'برگشت خورده',
-    'تنزیل شده',
-  };
+  /// تاریخ امروز به قالب شمسی `YYYY/MM/DD` (هم‌قالب dueDate در فایل HCH).
+  static String _todayJalali() {
+    final now = Jalali.now();
+    return '${now.year.toString().padLeft(4, '0')}/'
+        '${now.month.toString().padLeft(2, '0')}/'
+        '${now.day.toString().padLeft(2, '0')}';
+  }
 
   @override
   void initState() {
@@ -61,10 +63,9 @@ class _ChequesScreenState extends State<ChequesScreen>
     }).toList()
       ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
 
-    final active =
-        filtered.where((c) => !_settledStatuses.contains(c.status)).toList();
-    final settled =
-        filtered.where((c) => _settledStatuses.contains(c.status)).toList();
+    final today = _todayJalali();
+    final overdue = filtered.where((c) => isChequeOverdue(c, today)).toList();
+    final active = filtered.where((c) => !isChequeOverdue(c, today)).toList();
 
     return Column(
       children: [
@@ -132,10 +133,7 @@ class _ChequesScreenState extends State<ChequesScreen>
                 children: [
                   const Text('سررسید گذشته'),
                   const SizedBox(width: 6),
-                  _CountBadge(
-                    count: settled.length,
-                    color: AppColors.mutedText,
-                  ),
+                  _CountBadge(count: overdue.length, color: AppColors.danger),
                 ],
               ),
             ),
@@ -147,9 +145,8 @@ class _ChequesScreenState extends State<ChequesScreen>
             children: [
               _ChequeList(cheques: active, emptyText: 'چک فعالی وجود ندارد.'),
               _ChequeList(
-                cheques: settled,
+                cheques: overdue,
                 emptyText: 'چک سررسید گذشته‌ای وجود ندارد.',
-                muted: true,
               ),
             ],
           ),
@@ -186,15 +183,10 @@ class _CountBadge extends StatelessWidget {
 }
 
 class _ChequeList extends StatelessWidget {
-  const _ChequeList({
-    required this.cheques,
-    required this.emptyText,
-    this.muted = false,
-  });
+  const _ChequeList({required this.cheques, required this.emptyText});
 
   final List<Cheque> cheques;
   final String emptyText;
-  final bool muted;
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +197,7 @@ class _ChequeList extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
       itemCount: cheques.length,
       itemBuilder: (context, index) =>
-          _ChequeCard(cheque: cheques[index], muted: muted),
+          _ChequeCard(cheque: cheques[index], muted: cheques[index].isSettled),
     );
   }
 }

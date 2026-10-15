@@ -113,7 +113,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               formatPercent(selected.cargoCustomer.moisturePercent),
             ),
             _StatisticsRow(
-              'مجموع وزن کاغذ خروجی',
+              'وزن خالص کاغذ (خروجی − ورودی)',
               formatWeight(selected.cargoCustomer.paperWeight),
             ),
             _StatisticsRow(

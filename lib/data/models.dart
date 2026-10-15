@@ -113,11 +113,8 @@ class MonthlyCargoCustomer {
         'moisturePercent',
         scope: scope,
       ),
-      paperWeight: _requiredNonNegativeNumber(
-        json,
-        'paperWeight',
-        scope: scope,
-      ),
+      // خروج کاغذ − ورود کاغذ؛ می‌تواند منفی باشد (راهنمای ورود کاغذ).
+      paperWeight: _requiredNumber(json, 'paperWeight', scope: scope),
       customerWeight: _requiredNonNegativeNumber(
         json,
         'customerWeight',
@@ -1133,6 +1130,12 @@ class Cheque {
         ? <String>[]
         : (allocatedRaw as List).map((e) => e.toString()).toList(growable: false);
 
+    final direction = _optionalText(json['direction'], fallback: 'out');
+    final status = normalizeChequeStatus(
+      _optionalText(json['status'], fallback: ''),
+      direction,
+    );
+
     return Cheque(
       id: _optionalText(json['id'], fallback: ''),
       checkNumber: _optionalText(json['checkNumber'], fallback: ''),
@@ -1142,11 +1145,53 @@ class Cheque {
       partyName: _optionalText(json['partyName'], fallback: ''),
       operationType: _optionalText(json['operationType'], fallback: ''),
       description: _optionalText(json['description'], fallback: ''),
-      direction: _optionalText(json['direction'], fallback: 'out'),
-      status: _optionalText(json['status'], fallback: ''),
+      direction: direction,
+      status: status,
       allocatedTo: allocatedTo,
       statusLog: statusLog,
     );
+  }
+}
+
+/// وضعیت‌هایی که چک با گذشتن تاریخ سررسید «سررسید گذشته» حساب می‌شود.
+/// مطابق فایل `overdue_check_settings.json` برنامه‌ی ویندوز؛ اگر در ویندوز
+/// تیک وضعیتی برداشته شد، همان وضعیت را از این لیست حذف کنید.
+const Set<String> overdueChequeStatuses = {
+  'دست ما (ثبت نشده)',
+  'دست دیگری (ثبت نشده)',
+  'ثبت شده برای ما',
+  'ثبت شده برای دیگری',
+  'پاس شده',
+  'برگشت خورده',
+  'تنزیل شده',
+};
+
+/// چک وقتی «سررسید گذشته» است که تاریخ سررسیدش (شمسی، `YYYY/MM/DD`) قبل از
+/// امروز باشد و وضعیتش در [overdueChequeStatuses] باشد. سررسیدِ امروز هنوز نگذشته است.
+bool isChequeOverdue(
+  Cheque cheque,
+  String todayJalali, {
+  Set<String> statuses = overdueChequeStatuses,
+}) {
+  return cheque.dueDate.isNotEmpty &&
+      cheque.dueDate.compareTo(todayJalali) < 0 &&
+      statuses.contains(cheque.status);
+}
+
+/// نام‌های قدیمی وضعیت (که ویندوز تا پایان دوره‌ی مهاجرت می‌فرستد) را به
+/// نام‌های جدید تبدیل می‌کند؛ نام‌های جدید و ناشناخته دست‌نخورده می‌مانند.
+String normalizeChequeStatus(String status, String direction) {
+  switch (status) {
+    case 'ثبت نشده دست ما':
+      return 'دست ما (ثبت نشده)';
+    case 'ثبت نشده به مشتری':
+    case 'منتقل‌شده به مشتری':
+    case 'نزد صاحب حساب':
+      return 'دست دیگری (ثبت نشده)';
+    case 'ثبت شده برای ما':
+      return direction == 'out' ? 'ثبت شده برای دیگری' : status;
+    default:
+      return status;
   }
 }
 
