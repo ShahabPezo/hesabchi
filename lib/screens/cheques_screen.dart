@@ -6,6 +6,7 @@ import '../app_theme.dart';
 import '../core/formatters.dart';
 import '../data/models.dart';
 import '../state/app_controller.dart';
+import '../widgets/cheque_history_sheet.dart';
 import '../widgets/ui_components.dart';
 
 class ChequesScreen extends StatefulWidget {
@@ -64,8 +65,13 @@ class _ChequesScreenState extends State<ChequesScreen>
       ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
 
     final today = _todayJalali();
-    final overdue = filtered.where((c) => isChequeOverdue(c, today)).toList();
+    // سررسید گذشته: از جدیدترین سررسید به قدیمی‌ترین (مثل ویندوز).
+    final overdue = filtered.where((c) => isChequeOverdue(c, today)).toList()
+      ..sort((a, b) => b.dueDate.compareTo(a.dueDate));
     final active = filtered.where((c) => !isChequeOverdue(c, today)).toList();
+    // «نزدیک به سررسید»: روی همه‌ی چک‌های فعال، مستقل از جست‌وجو و فیلتر.
+    final now = DateTime.now();
+    final nearDueCount = allCheques.where((c) => isChequeNearDue(c, now)).length;
 
     return Column(
       children: [
@@ -114,6 +120,7 @@ class _ChequesScreenState extends State<ChequesScreen>
             onSelectionChanged: (s) => setState(() => _filter = s.first),
           ),
         ),
+        _NearDueBanner(count: nearDueCount),
         TabBar(
           controller: _tabController,
           tabs: [
@@ -143,15 +150,50 @@ class _ChequesScreenState extends State<ChequesScreen>
           child: TabBarView(
             controller: _tabController,
             children: [
-              _ChequeList(cheques: active, emptyText: 'چک فعالی وجود ندارد.'),
+              _ChequeList(
+                cheques: active,
+                allCheques: allCheques,
+                emptyText: 'چک فعالی وجود ندارد.',
+              ),
               _ChequeList(
                 cheques: overdue,
+                allCheques: allCheques,
                 emptyText: 'چک سررسید گذشته‌ای وجود ندارد.',
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _NearDueBanner extends StatelessWidget {
+  const _NearDueBanner({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = count > 0 ? AppColors.danger : AppColors.mutedText;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+      child: Row(
+        children: [
+          Icon(Icons.schedule_outlined, size: 16, color: color),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              'نزدیک به سررسید (تا ۷ روز آینده): '
+              '${toPersianDigits(count.toString())} چک',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -183,9 +225,14 @@ class _CountBadge extends StatelessWidget {
 }
 
 class _ChequeList extends StatelessWidget {
-  const _ChequeList({required this.cheques, required this.emptyText});
+  const _ChequeList({
+    required this.cheques,
+    required this.allCheques,
+    required this.emptyText,
+  });
 
   final List<Cheque> cheques;
+  final List<Cheque> allCheques;
   final String emptyText;
 
   @override
@@ -196,16 +243,27 @@ class _ChequeList extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
       itemCount: cheques.length,
-      itemBuilder: (context, index) =>
-          _ChequeCard(cheque: cheques[index], muted: cheques[index].isSettled),
+      itemBuilder: (context, index) {
+        final cheque = cheques[index];
+        return _ChequeCard(
+          cheque: cheque,
+          muted: cheque.isSettled,
+          onTap: () => showChequeHistorySheet(context, cheque, allCheques),
+        );
+      },
     );
   }
 }
 
 class _ChequeCard extends StatelessWidget {
-  const _ChequeCard({required this.cheque, this.muted = false});
+  const _ChequeCard({
+    required this.cheque,
+    required this.onTap,
+    this.muted = false,
+  });
 
   final Cheque cheque;
+  final VoidCallback onTap;
   final bool muted;
 
   @override
@@ -221,7 +279,10 @@ class _ChequeCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Card(
-        child: Padding(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,6 +370,7 @@ class _ChequeCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

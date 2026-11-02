@@ -1108,11 +1108,7 @@ class Cheque {
   bool get isIncoming => direction == 'in';
 
   // چک‌های غیرفعال (تسویه‌شده)
-  static const _settledStatuses = {
-    'پاس شده', 'برگشت خورده', 'تنزیل شده',
-    'برداشت مدیر', 'منتقل شده',
-    'برگشت داده شده',
-  };
+  static const _settledStatuses = {'پاس شده', 'برگشت خورده', 'تنزیل شده'};
 
   bool get isSettled => _settledStatuses.contains(status);
   bool get isActive => !isSettled;
@@ -1153,29 +1149,60 @@ class Cheque {
   }
 }
 
-/// وضعیت‌هایی که چک با گذشتن تاریخ سررسید «سررسید گذشته» حساب می‌شود.
-/// مطابق فایل `overdue_check_settings.json` برنامه‌ی ویندوز؛ اگر در ویندوز
-/// تیک وضعیتی برداشته شد، همان وضعیت را از این لیست حذف کنید.
-const Set<String> overdueChequeStatuses = {
-  'دست ما (ثبت نشده)',
-  'دست دیگری (ثبت نشده)',
-  'ثبت شده برای ما',
-  'ثبت شده برای دیگری',
-  'پاس شده',
-  'برگشت خورده',
-  'تنزیل شده',
-};
+/// «سررسید گذشته» (هم‌سان ویندوز): هر چکی که تاریخ سررسیدش (شمسی، `YYYY/MM/DD`)
+/// قبل از امروز باشد، با هر نوع و هر وضعیتی. سررسیدِ امروز هنوز نگذشته است.
+bool isChequeOverdue(Cheque cheque, String todayJalali) {
+  return cheque.dueDate.isNotEmpty && cheque.dueDate.compareTo(todayJalali) < 0;
+}
 
-/// چک وقتی «سررسید گذشته» است که تاریخ سررسیدش (شمسی، `YYYY/MM/DD`) قبل از
-/// امروز باشد و وضعیتش در [overdueChequeStatuses] باشد. سررسیدِ امروز هنوز نگذشته است.
-bool isChequeOverdue(
-  Cheque cheque,
-  String todayJalali, {
-  Set<String> statuses = overdueChequeStatuses,
-}) {
-  return cheque.dueDate.isNotEmpty &&
-      cheque.dueDate.compareTo(todayJalali) < 0 &&
-      statuses.contains(cheque.status);
+/// تعداد روز از [today] تا سررسید چک (امروز = ۰، دیروز = −۱)؛
+/// اگر تاریخ سررسید خالی یا نامعتبر باشد null.
+int? chequeDaysUntilDue(Cheque cheque, DateTime today) {
+  final parts = cheque.dueDate.split('/');
+  if (parts.length != 3) return null;
+  final year = int.tryParse(parts[0]);
+  final month = int.tryParse(parts[1]);
+  final day = int.tryParse(parts[2]);
+  if (year == null || month == null || day == null) return null;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  try {
+    final due = Jalali(year, month, day).toDateTime();
+    return DateTime.utc(due.year, due.month, due.day)
+        .difference(DateTime.utc(today.year, today.month, today.day))
+        .inDays;
+  } catch (_) {
+    return null;
+  }
+}
+
+/// «نزدیک به سررسید»: چک **فعال** (دریافتی یا صادره) که از امروز تا [days] روز
+/// بعد (هر دو سر شامل) سررسید دارد.
+bool isChequeNearDue(Cheque cheque, DateTime today, {int days = 7}) {
+  if (!cheque.isActive) return false;
+  final left = chequeDaysUntilDue(cheque, today);
+  return left != null && left >= 0 && left <= days;
+}
+
+int _compareChequeIds(String a, String b) {
+  final numberA = int.tryParse(a.replaceAll(RegExp(r'[^0-9]'), ''));
+  final numberB = int.tryParse(b.replaceAll(RegExp(r'[^0-9]'), ''));
+  if (numberA != null && numberB != null && numberA != numberB) {
+    return numberA.compareTo(numberB);
+  }
+  return a.compareTo(b);
+}
+
+/// تاریخچه‌ی یک چک بر اساس شماره‌ی چک: همه‌ی چک‌های هم‌شماره، به ترتیب
+/// تاریخ فاکتور و بعد شناسه. چک بدون شماره فقط خودش را برمی‌گرداند.
+List<Cheque> chequeHistory(Cheque cheque, Iterable<Cheque> all) {
+  final key = cheque.checkNumber.trim();
+  if (key.isEmpty) return [cheque];
+  final rows = all.where((item) => item.checkNumber.trim() == key).toList()
+    ..sort((a, b) {
+      final byDate = a.issueDate.compareTo(b.issueDate);
+      return byDate != 0 ? byDate : _compareChequeIds(a.id, b.id);
+    });
+  return rows;
 }
 
 /// نام‌های قدیمی وضعیت (که ویندوز تا پایان دوره‌ی مهاجرت می‌فرستد) را به
