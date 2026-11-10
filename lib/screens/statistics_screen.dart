@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 
 import '../app_theme.dart';
 import '../core/formatters.dart';
 import '../data/models.dart';
 import '../state/app_controller.dart';
+import '../widgets/daily_cargo_section.dart';
 import '../widgets/ui_components.dart';
 
 class StatisticsScreen extends StatefulWidget {
@@ -18,15 +20,23 @@ class StatisticsScreen extends StatefulWidget {
 
 class _StatisticsScreenState extends State<StatisticsScreen> {
   String? _selectedMonthKey;
+  Jalali? _dailyDay;
 
   @override
   Widget build(BuildContext context) {
     final data = context.watch<AppController>().dataset!;
     final statuses = data.monthlyStatuses;
+    final dailyDay = _dailyDay ?? Jalali.now();
     if (statuses.isEmpty) {
       return ListView(
         padding: const EdgeInsets.fromLTRB(20, 28, 20, 32),
         children: [
+          DailyCargoSection(
+            dataset: data,
+            day: dailyDay,
+            onDayChanged: (value) => setState(() => _dailyDay = value),
+          ),
+          const SizedBox(height: 20),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -77,6 +87,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
       children: [
+        DailyCargoSection(
+          dataset: data,
+          day: dailyDay,
+          onDayChanged: (value) => setState(() => _dailyDay = value),
+        ),
+        const SizedBox(height: 28),
         _MonthSelector(
           statuses: statuses,
           selected: selected,
